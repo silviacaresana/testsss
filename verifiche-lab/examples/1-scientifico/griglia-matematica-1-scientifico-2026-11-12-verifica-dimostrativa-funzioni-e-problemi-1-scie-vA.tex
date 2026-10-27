@@ -1,0 +1,288 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[italian]{babel}
+\usepackage[a4paper,top=1.8cm,bottom=1.8cm,left=2cm,right=2cm,headheight=15pt]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{pgffor}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage{needspace}
+\usepackage{array}
+\usepackage{textcomp}
+\usepackage{pdflscape}
+\usepackage[hidelinks]{hyperref}
+\sisetup{output-decimal-marker={,},group-separator={.},per-mode=symbol}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{2pt}
+\setlist[enumerate]{itemsep=6pt,topsep=4pt,leftmargin=8mm}
+\setlist[itemize]{itemsep=2pt,topsep=3pt,leftmargin=6mm}
+\raggedbottom
+
+% Comandi personalizzati: modifica qui la grafica senza toccare il codice.
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancyfoot[C]{\small Pag. \thepage\ di \pageref{LastPage}}
+
+% Punteggio a destra della consegna.
+\newcommand{\punti}[1]{\hfill\textbf{[#1~pt]}}
+
+% Riga puntinata per lo svolgimento.
+\newcommand{\riga}{\noindent\makebox[\linewidth]{\dotfill}\par\vspace{4mm}}
+
+% N righe puntinate (se N = 0 non stampa nulla: il chiamante evita il caso).
+\newcommand{\rispostarighe}[1]{\par\vspace{1mm}\foreach \i in {1,...,#1}{\riga}}
+
+% Riquadro per la risposta.
+\newcommand{\riquadro}{\par\noindent\framebox[\linewidth]{\rule{0pt}{2.6cm}}\par}
+
+% Griglia quadrettata per grafici e disegni.
+\newcommand{\griglia}{\par\noindent
+  \begin{tikzpicture}[x=0.55cm,y=0.55cm]
+    \draw[step=1,lightgray,very thin] (0,0) grid (16,10);
+    \draw[black!60,thick] (0,0) rectangle (16,10);
+  \end{tikzpicture}\par}
+
+% Piano cartesiano con assi e scala.
+\newcommand{\grigliacartesiana}{\par\noindent
+  \begin{tikzpicture}[x=0.55cm,y=0.55cm]
+    \draw[step=1,lightgray,very thin] (0,0) grid (16,10);
+    \draw[->,thick] (0,5) -- (16,5) node[right] {\small $x$};
+    \draw[->,thick] (8,0) -- (8,10) node[above] {\small $y$};
+    \foreach \x in {2,4,6,10,12,14} \draw (\x,4.8) -- (\x,5.2);
+    \foreach \y in {1,3,7,9} \draw (7.8,\y) -- (8.2,\y);
+  \end{tikzpicture}\par}
+
+% Intestazione della verifica: istituto, indirizzo, materia, classe, data, tempo, punti, soglia.
+\newcommand{\intestazione}[8]{%
+  \begin{center}
+    {\large\bfseries #1}\\[1mm]
+    {\small #2\ --\ #3}\\[3mm]
+    {\Large\bfseries #4}\\[3mm]
+    \begin{tabular}{@{}p{0.48\textwidth}p{0.48\textwidth}@{}}
+      Classe: #5 & Data: #6 \\
+      Tempo: #7 & Punteggio: #8 \\
+    \end{tabular}
+  \end{center}
+}
+
+% Titolo di sezione con spazio garantito.
+\newcommand{\titolosezione}[1]{\par\needspace{4\baselineskip}\section*{#1}\vspace{-1mm}}
+
+% Blocco soluzione.
+\newcommand{\soluzione}[1]{\par\noindent #1\par}
+
+% Casella per gli errori comuni (soluzioni).
+\newcommand{\erroricomuni}[1]{%
+  \par\smallskip
+  \noindent\fcolorbox{black!25}{black!3}{%
+    \begin{minipage}{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}
+      \small\textbf{Errori comuni attesi:} #1
+    \end{minipage}}\par\smallskip
+}
+
+\fancyhead[L]{\small Liceo Statale di Esempio}
+\fancyhead[R]{\small Griglia di valutazione}
+
+\begin{document}
+
+\begin{center}
+  {\Large\bfseries Griglia di valutazione}\\[2mm]
+  {\large Verifica dimostrativa --- Funzioni e problemi (1\textsuperscript{a} Scientifico)}\\[1.5mm]
+  {\small Liceo Scientifico\ --\ Classe 1\textsuperscript{a} B\ --\ 12/11/2026\ --\ Durata 60 minuti}
+\end{center}
+\vspace{1mm}
+\noindent\rule{\linewidth}{0.4pt}
+
+\section*{Dati della prova}
+\begin{center}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Punteggio totale & 100 & Soglia di sufficienza & 60\,\% \\
+Numero di quesiti & 8 & Tempo assegnato & 60 minuti \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section*{Indicatori e livelli}
+
+\noindent\textbf{Livello 1 -- Iniziale:} \small Conoscenze frammentarie e applicazione guidata con errori frequenti.\normalsize\par\vspace{1mm}
+
+\noindent\textbf{Livello 2 -- Base:} \small Conoscenze essenziali e applicazione corretta in situazioni note.\normalsize\par\vspace{1mm}
+
+\noindent\textbf{Livello 3 -- Intermedio:} \small Conoscenze solide, procedure corrette e motivazione adeguata.\normalsize\par\vspace{1mm}
+
+\noindent\textbf{Livello 4 -- Avanzato:} \small Padronanza completa, autonomia, argomentazione rigorosa.\normalsize\par\vspace{1mm}
+
+
+\begin{landscape}
+\section*{Descrittori per indicatore}
+\small
+\begin{longtable}{@{}p{2.3cm}p{4.3cm}p{4.3cm}p{4.3cm}p{4.3cm}@{}}
+\toprule
+\textbf{Indicatore} & \textbf{Livello 1} & \textbf{Livello 2} & \textbf{Livello 3} & \textbf{Livello 4} \\
+\midrule
+\endhead
+
+\textbf{Conoscenze} & Conosce in modo frammentario e superficiale i concetti; commette errori anche in situazioni note. & Conosce i concetti essenziali; li richiama correttamente in situazioni standard. & Conosce i concetti in modo completo e li collega tra loro in modo pertinente. & Padroneggia i concetti, li collega e li utilizza anche in contesti nuovi. \\
+\addlinespace
+
+\textbf{Abilità procedurali} & Applica le procedure con errori frequenti e necessita di guida costante. & Applica le procedure essenziali in modo corretto in situazioni note. & Applica le procedure in modo corretto, ordinato e consapevole. & Applica le procedure con sicurezza, scegliendo la strategia più efficiente. \\
+\addlinespace
+
+\textbf{Risoluzione di problemi} & Riconosce solo parzialmente i dati e non individua una strategia risolutiva. & Imposta il problema in modo essenziale e risolve semplici situazioni standard. & Imposta e risolve problemi articolati, motivando le scelte principali. & Analizza problemi complessi, generalizza e valuta la plausibilità del risultato. \\
+\addlinespace
+
+\textbf{Linguaggio e argomentazione} & Espone in modo confuso, con lessico e simboli usati in modo improprio. & Espone in modo comprensibile, con lessico essenziale e qualche imprecisione. & Espone in modo chiaro e corretto, usando il linguaggio specifico. & Argomenta in modo rigoroso, essenziale e ben strutturato. \\
+\addlinespace
+
+\bottomrule
+\end{longtable}
+\end{landscape}
+
+\section*{Punteggi per indicatore}
+\begin{center}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+\textbf{Indicatore} & \textbf{Punti disponibili} & \textbf{Percentuale} \\
+\midrule
+
+Conoscenze & 19,25 & 19,3\,\% \\
+
+Abilità procedurali & 43,63 & 43,6\,\% \\
+
+Risoluzione di problemi & 30,63 & 30,6\,\% \\
+
+Linguaggio e argomentazione & 6,5 & 6,5\,\% \\
+
+\midrule
+\textbf{Totale} & \textbf{100} & \textbf{100}\,\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section*{Mappatura dei quesiti}
+{\small
+\begin{longtable}{@{}p{0.7cm}p{2.1cm}p{1.2cm}p{3.9cm}p{5.8cm}@{}}
+\toprule
+\textbf{N.} & \textbf{Tipologia} & \textbf{Punti} & \textbf{Indicatori} & \textbf{Criteri di attribuzione} \\
+\midrule
+\endhead
+
+1 & Scelta multipla & 4,25 & Conoscenze & 4\{,\}25 pt risposta corretta; 0 pt risposta errata o non data \\
+\addlinespace
+
+2 & Vero/Falso & 4,25 & Conoscenze & 4\{,\}25 pt risposta corretta; 0 pt risposta errata o non data \\
+\addlinespace
+
+3 & Scelta multipla & 4,25 & Conoscenze & 4\{,\}25 pt risposta corretta; 0 pt risposta errata o non data \\
+\addlinespace
+
+4 & Risposta breve & 6,5 & Conoscenze, Linguaggio e argomentazione & 2\{,\}5 pt impostazione corretta e dati individuati; 2\{,\}5 pt procedimento e calcoli corretti; 1\{,\}25 pt risultato e verifica \\
+\addlinespace
+
+5 & Risposta breve & 6,5 & Conoscenze, Linguaggio e argomentazione & 2\{,\}5 pt impostazione corretta e dati individuati; 2\{,\}5 pt procedimento e calcoli corretti; 1\{,\}25 pt risultato e verifica \\
+\addlinespace
+
+6 & Esercizio & 13 & Abilità procedurali & 5\{,\}25 pt impostazione corretta e dati individuati; 5\{,\}25 pt procedimento e calcoli corretti; 2\{,\}5 pt risultato e verifica \\
+\addlinespace
+
+7 & Problema & 30,75 & Abilità procedurali, Risoluzione di problemi & 12\{,\}25 pt impostazione corretta e dati individuati; 12\{,\}25 pt procedimento e calcoli corretti; 6\{,\}25 pt risultato e verifica \\
+\addlinespace
+
+8 & Problema & 30,5 & Abilità procedurali, Risoluzione di problemi & 12\{,\}25 pt impostazione corretta e dati individuati; 12\{,\}25 pt procedimento e calcoli corretti; 6 pt risultato e verifica \\
+\addlinespace
+
+\bottomrule
+\end{longtable}
+}
+
+\section*{Conversione punteggio -- voto}
+\begin{center}
+\small
+\begin{longtable}{@{}rrr@{}}
+\toprule
+\textbf{Punteggio} & \textbf{Percentuale} & \textbf{Voto (decimi)} \\
+\midrule
+\endhead
+
+
+0 & 0\,\% & \textbf{2} \\
+
+
+5 & 5\,\% & \textbf{2,25} \\
+
+
+10 & 10\,\% & \textbf{2,75} \\
+
+
+15 & 15\,\% & \textbf{3} \\
+
+
+20 & 20\,\% & \textbf{3,25} \\
+
+
+25 & 25\,\% & \textbf{3,75} \\
+
+
+30 & 30\,\% & \textbf{4} \\
+
+
+35 & 35\,\% & \textbf{4,25} \\
+
+
+40 & 40\,\% & \textbf{4,75} \\
+
+
+45 & 45\,\% & \textbf{5} \\
+
+
+50 & 50\,\% & \textbf{5,25} \\
+
+
+55 & 55\,\% & \textbf{5,75} \\
+
+\midrule
+60 & 60\,\% & \textbf{6} \\
+
+
+65 & 65\,\% & \textbf{6,5} \\
+
+
+70 & 70\,\% & \textbf{7} \\
+
+
+75 & 75\,\% & \textbf{7,5} \\
+
+
+80 & 80\,\% & \textbf{8} \\
+
+
+85 & 85\,\% & \textbf{8,5} \\
+
+
+90 & 90\,\% & \textbf{9} \\
+
+
+95 & 95\,\% & \textbf{9,5} \\
+
+
+100 & 100\,\% & \textbf{10} \\
+
+\bottomrule
+\end{longtable}
+\end{center}
+\noindent\small Soglia di sufficienza: 60\,\% del punteggio totale (60 punti) $\Rightarrow$ voto 6.
+
+\vspace{8mm}
+\noindent Data: \dotfill \hfill Firma del docente: \dotfill
+
+\end{document}

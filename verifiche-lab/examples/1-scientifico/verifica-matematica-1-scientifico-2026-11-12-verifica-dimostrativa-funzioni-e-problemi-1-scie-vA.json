@@ -1,0 +1,574 @@
+{
+  "formato": "VerificheLab/1",
+  "generatoIl": "2026-10-26T16:12:24.819Z",
+  "verifica": {
+    "id": "cmvpg6js6002pu0r4yqghyr6t",
+    "title": "Verifica dimostrativa — Funzioni e problemi (1ª Scientifico)",
+    "track": "scientifico",
+    "year": 1,
+    "subject": "matematica",
+    "classLabel": "1ª B",
+    "examDate": "2026-11-12T00:00:00.000Z",
+    "durationMin": 60,
+    "totalPoints": 100,
+    "difficultyTarget": 2.5,
+    "calculatorAllowed": false,
+    "formulaSheet": false,
+    "status": "approvata",
+    "versionLabel": "A",
+    "sections": [
+      {
+        "id": "cmvpg6jsc002ru0r4d6x4vz0i",
+        "testId": "cmvpg6js6002pu0r4yqghyr6t",
+        "title": "Quesiti a risposta chiusa",
+        "description": "Una sola risposta corretta.",
+        "order": 0
+      },
+      {
+        "id": "cmvpg6jse002tu0r47mqf7vwx",
+        "testId": "cmvpg6js6002pu0r4yqghyr6t",
+        "title": "Quesiti a risposta breve",
+        "description": "",
+        "order": 1
+      },
+      {
+        "id": "cmvpg6jse002vu0r4h5b5gepv",
+        "testId": "cmvpg6js6002pu0r4yqghyr6t",
+        "title": "Esercizi",
+        "description": "",
+        "order": 2
+      },
+      {
+        "id": "cmvpg6jsf002xu0r4m46pdwfp",
+        "testId": "cmvpg6js6002pu0r4yqghyr6t",
+        "title": "Problemi e dimostrazioni",
+        "description": "",
+        "order": 3
+      }
+    ],
+    "items": [
+      {
+        "id": "cmvpg6jsh002zu0r4nok6md9h",
+        "testId": "cmvpg6js6002pu0r4yqghyr6t",
+        "sectionId": "cmvpg6jse002vu0r4h5b5gepv",
+        "type": "exercise",
+        "prompt": "Scomponi il trinomio $x^2 + 2x - 3$. Verifica il risultato ottenuto.",
+        "options": [],
+        "correctOption": null,
+        "points": 13,
+        "difficulty": 3,
+        "estimatedMin": 5,
+        "topicId": "cmvpg6jl0000zu0r439jww3tw",
+        "objectives": [
+          "SCI1.POL.1"
+        ],
+        "solutionSteps": [
+          "Cerchiamo due numeri con somma $-2$ e prodotto $-3$.",
+          "I numeri sono $1$ e $-3$.",
+          "Quindi $x^2 + 2x - 3 = $(x - 1)(x + 3)$$."
+        ],
+        "gradingCriteria": [
+          "5{,}25 pt impostazione corretta e dati individuati",
+          "5{,}25 pt procedimento e calcoli corretti",
+          "2{,}5 pt risultato e verifica"
+        ],
+        "commonErrors": [
+          "Segni dei fattori invertiti",
+          "Scambiare somma e prodotto",
+          "Dimenticare il coefficiente del termine noto"
+        ],
+        "hints": [],
+        "answerSpace": "lined",
+        "answerLines": 0,
+        "figureSpec": null,
+        "source": "ai",
+        "isLocked": false,
+        "order": 0,
+        "aiGenerated": true,
+        "variantGroup": "g1",
+        "notes": "",
+        "createdAt": "2026-10-26T16:04:56.369Z",
+        "updatedAt": "2026-10-26T16:04:56.369Z",
+        "topic": {
+          "id": "cmvpg6jl0000zu0r439jww3tw",
+          "curriculumId": "cmvpg6jkz000yu0r493pfejje",
+          "parentId": null,
+          "code": "SCI1.POL",
+          "name": "Polinomi e scomposizioni",
+          "description": "Calcolo letterale, prodotti notevoli e scomposizioni.",
+          "weightHint": 15,
+          "difficultyMin": 1,
+          "difficultyMax": 3,
+          "isCore": true,
+          "order": 0,
+          "createdAt": "2026-10-26T16:04:56.098Z"
+        }
+      },
+      {
+        "id": "cmvpg6jsj0031u0r4vfo9f8an",
+        "testId": "cmvpg6js6002pu0r4yqghyr6t",
+        "sectionId": "cmvpg6jse002tu0r47mqf7vwx",
+        "type": "short_answer",
+        "prompt": "Determina la soluzione dell'equazione $3x + 2 = 20$, motivando i passaggi. Scrivi il risultato e una breve giustificazione.",
+        "options": [],
+        "correctOption": null,
+        "points": 6.5,
+        "difficulty": 4,
+        "estimatedMin": 6,
+        "topicId": "cmvpg6jl00012u0r4mv7t94c2",
+        "objectives": [
+          "SCI1.EQ.2"
+        ],
+        "solutionSteps": [
+          "Isola il termine con l'incognita: $3x = 20 - 2 = 18$.",
+          "Dividi entrambi i membri per $3$: $x = \\dfrac{18}{3} = 6$.",
+          "Verifica: $3\\cdot 6 + 2 = 20$, quindi la soluzione è corretta."
+        ],
+        "gradingCriteria": [
+          "2{,}5 pt impostazione corretta e dati individuati",
+          "2{,}5 pt procedimento e calcoli corretti",
+          "1{,}25 pt risultato e verifica"
+        ],
+        "commonErrors": [
+          "Errore di segno nel trasporto di un termine",
+          "Divisione non eseguita per il coefficiente dell'incognita",
+          "Verifica non effettuata"
+        ],
+        "hints": [],
+        "answerSpace": "lined",
+        "answerLines": 0,
+        "figureSpec": null,
+        "source": "ai",
+        "isLocked": false,
+        "order": 1,
+        "aiGenerated": true,
+        "variantGroup": "g2",
+        "notes": "",
+        "createdAt": "2026-10-26T16:04:56.371Z",
+        "updatedAt": "2026-10-26T16:04:56.371Z",
+        "topic": {
+          "id": "cmvpg6jl00012u0r4mv7t94c2",
+          "curriculumId": "cmvpg6jkz000yu0r493pfejje",
+          "parentId": null,
+          "code": "SCI1.EQ",
+          "name": "Equazioni di primo grado",
+          "description": "Equazioni lineari, equazioni equivalenti e verifica.",
+          "weightHint": 15,
+          "difficultyMin": 1,
+          "difficultyMax": 3,
+          "isCore": true,
+          "order": 1,
+          "createdAt": "2026-10-26T16:04:56.098Z"
+        }
+      },
+      {
+        "id": "cmvpg6jsl0033u0r42amu2g0n",
+        "testId": "cmvpg6js6002pu0r4yqghyr6t",
+        "sectionId": "cmvpg6jsc002ru0r4d6x4vz0i",
+        "type": "multiple_choice",
+        "prompt": "Trova il valore di $x$ che rende vera l'uguaglianza $2x - 8 = 6$. Scegli la risposta corretta.",
+        "options": [
+          "$x = 6$",
+          "$x = 7$",
+          "$x = 8$",
+          "$x = -7$"
+        ],
+        "correctOption": 1,
+        "points": 4.25,
+        "difficulty": 2,
+        "estimatedMin": 2,
+        "topicId": "cmvpg6jl10015u0r4vpw16sb5",
+        "objectives": [
+          "SCI1.DIS.1"
+        ],
+        "solutionSteps": [
+          "Isola il termine con l'incognita: $2x = 6 + 8 = 14$.",
+          "Dividi entrambi i membri per $2$: $x = \\dfrac{14}{2} = 7$.",
+          "Verifica: $2\\cdot 7 - 8 = 6$, quindi la soluzione è corretta."
+        ],
+        "gradingCriteria": [
+          "4{,}25 pt risposta corretta",
+          "0 pt risposta errata o non data"
+        ],
+        "commonErrors": [
+          "Errore di segno nel trasporto di un termine",
+          "Divisione non eseguita per il coefficiente dell'incognita",
+          "Verifica non effettuata"
+        ],
+        "hints": [],
+        "answerSpace": "none",
+        "answerLines": 0,
+        "figureSpec": null,
+        "source": "ai",
+        "isLocked": false,
+        "order": 2,
+        "aiGenerated": true,
+        "variantGroup": "g3",
+        "notes": "",
+        "createdAt": "2026-10-26T16:04:56.373Z",
+        "updatedAt": "2026-10-26T16:04:56.373Z",
+        "topic": {
+          "id": "cmvpg6jl10015u0r4vpw16sb5",
+          "curriculumId": "cmvpg6jkz000yu0r493pfejje",
+          "parentId": null,
+          "code": "SCI1.DIS",
+          "name": "Disequazioni di primo grado",
+          "description": "Disequazioni lineari e rappresentazione delle soluzioni.",
+          "weightHint": 10,
+          "difficultyMin": 2,
+          "difficultyMax": 3,
+          "isCore": true,
+          "order": 2,
+          "createdAt": "2026-10-26T16:04:56.098Z"
+        }
+      },
+      {
+        "id": "cmvpg6jsm0035u0r4q4uld8ip",
+        "testId": "cmvpg6js6002pu0r4yqghyr6t",
+        "sectionId": "cmvpg6jsc002ru0r4d6x4vz0i",
+        "type": "true_false",
+        "prompt": "Vero o falso? «Il risultato corretto è $y = -1$». Motiva la risposta.",
+        "options": [],
+        "correctOption": null,
+        "points": 4.25,
+        "difficulty": 3,
+        "estimatedMin": 4,
+        "topicId": "cmvpg6jl10018u0r4q6psw7xv",
+        "objectives": [
+          "SCI1.FUN.2"
+        ],
+        "solutionSteps": [
+          "L'affermazione è falsa: il risultato corretto è $y = -2$.",
+          "Sostituisci $x = 2$ nell'espressione: $y = -3\\cdot 2 + 4$.",
+          "Calcola: $y = -6 + 4 = -2$.",
+          "Il punto $\\left(2; -2\\right)$ appartiene alla retta."
+        ],
+        "gradingCriteria": [
+          "4{,}25 pt risposta corretta",
+          "0 pt risposta errata o non data"
+        ],
+        "commonErrors": [
+          "Errore nel segno del coefficiente angolare",
+          "Sostituire il valore di y al posto di x"
+        ],
+        "hints": [],
+        "answerSpace": "none",
+        "answerLines": 0,
+        "figureSpec": null,
+        "source": "ai",
+        "isLocked": false,
+        "order": 3,
+        "aiGenerated": true,
+        "variantGroup": "g4",
+        "notes": "",
+        "createdAt": "2026-10-26T16:04:56.375Z",
+        "updatedAt": "2026-10-26T16:04:56.375Z",
+        "topic": {
+          "id": "cmvpg6jl10018u0r4q6psw7xv",
+          "curriculumId": "cmvpg6jkz000yu0r493pfejje",
+          "parentId": null,
+          "code": "SCI1.FUN",
+          "name": "Funzioni e piano cartesiano",
+          "description": "Funzioni, rette e lettura di grafici.",
+          "weightHint": 15,
+          "difficultyMin": 2,
+          "difficultyMax": 3,
+          "isCore": true,
+          "order": 3,
+          "createdAt": "2026-10-26T16:04:56.098Z"
+        }
+      },
+      {
+        "id": "cmvpg6jso0037u0r4x7s5xe74",
+        "testId": "cmvpg6js6002pu0r4yqghyr6t",
+        "sectionId": "cmvpg6jsf002xu0r4m46pdwfp",
+        "type": "problem",
+        "prompt": "Un giardino rettangolare è lungo $4\\,\\mathrm{m}$ e largo $10\\,\\mathrm{m}$. Quanti metri di recinzione servono e qual è la sua area?",
+        "options": [],
+        "correctOption": null,
+        "points": 30.75,
+        "difficulty": 5,
+        "estimatedMin": 19,
+        "topicId": "cmvpg6jl1001bu0r4ue0518wx",
+        "objectives": [
+          "SCI1.GEO.1"
+        ],
+        "solutionSteps": [
+          "Area: $A = b \\cdot h = 4 \\cdot 10 = 40\\,\\mathrm{cm}^2$.",
+          "Perimetro: $P = 2(b + h) = 2(4 + 10) = 28\\,\\mathrm{cm}$.",
+          "Controllo: il perimetro è maggiore del doppio della base, come atteso."
+        ],
+        "gradingCriteria": [
+          "12{,}25 pt impostazione corretta e dati individuati",
+          "12{,}25 pt procedimento e calcoli corretti",
+          "6{,}25 pt risultato e verifica"
+        ],
+        "commonErrors": [
+          "Confondere area e perimetro",
+          "Dimenticare il fattore 2 nel perimetro",
+          "Unità di misura errate"
+        ],
+        "hints": [],
+        "answerSpace": "lined",
+        "answerLines": 0,
+        "figureSpec": null,
+        "source": "ai",
+        "isLocked": false,
+        "order": 4,
+        "aiGenerated": true,
+        "variantGroup": "g5",
+        "notes": "",
+        "createdAt": "2026-10-26T16:04:56.377Z",
+        "updatedAt": "2026-10-26T16:04:56.377Z",
+        "topic": {
+          "id": "cmvpg6jl1001bu0r4ue0518wx",
+          "curriculumId": "cmvpg6jkz000yu0r493pfejje",
+          "parentId": null,
+          "code": "SCI1.GEO",
+          "name": "Geometria euclidea e teorema di Pitagora",
+          "description": "Triangoli, quadrilateri e applicazioni del teorema di Pitagora.",
+          "weightHint": 15,
+          "difficultyMin": 2,
+          "difficultyMax": 3,
+          "isCore": true,
+          "order": 4,
+          "createdAt": "2026-10-26T16:04:56.098Z"
+        }
+      },
+      {
+        "id": "cmvpg6jsq0039u0r4x0aq0i4p",
+        "testId": "cmvpg6js6002pu0r4yqghyr6t",
+        "sectionId": "cmvpg6jse002tu0r47mqf7vwx",
+        "type": "short_answer",
+        "prompt": "Trova il valore di $x$ che rende vera l'uguaglianza $5x - 2 = 23$. Scrivi il risultato e una breve giustificazione.",
+        "options": [],
+        "correctOption": null,
+        "points": 6.5,
+        "difficulty": 2,
+        "estimatedMin": 2,
+        "topicId": "cmvpg6jl1001eu0r47v7mlc3z",
+        "objectives": [
+          "SCI1.SIS.2"
+        ],
+        "solutionSteps": [
+          "Isola il termine con l'incognita: $5x = 23 + 2 = 25$.",
+          "Dividi entrambi i membri per $5$: $x = \\dfrac{25}{5} = 5$.",
+          "Verifica: $5\\cdot 5 - 2 = 23$, quindi la soluzione è corretta."
+        ],
+        "gradingCriteria": [
+          "2{,}5 pt impostazione corretta e dati individuati",
+          "2{,}5 pt procedimento e calcoli corretti",
+          "1{,}25 pt risultato e verifica"
+        ],
+        "commonErrors": [
+          "Errore di segno nel trasporto di un termine",
+          "Divisione non eseguita per il coefficiente dell'incognita",
+          "Verifica non effettuata"
+        ],
+        "hints": [],
+        "answerSpace": "lined",
+        "answerLines": 0,
+        "figureSpec": null,
+        "source": "ai",
+        "isLocked": false,
+        "order": 5,
+        "aiGenerated": true,
+        "variantGroup": "g6",
+        "notes": "",
+        "createdAt": "2026-10-26T16:04:56.379Z",
+        "updatedAt": "2026-10-26T16:04:56.379Z",
+        "topic": {
+          "id": "cmvpg6jl1001eu0r47v7mlc3z",
+          "curriculumId": "cmvpg6jkz000yu0r493pfejje",
+          "parentId": null,
+          "code": "SCI1.SIS",
+          "name": "Sistemi lineari",
+          "description": "Sistemi di due equazioni in due incognite e modellizzazione.",
+          "weightHint": 10,
+          "difficultyMin": 2,
+          "difficultyMax": 3,
+          "isCore": true,
+          "order": 5,
+          "createdAt": "2026-10-26T16:04:56.098Z"
+        }
+      },
+      {
+        "id": "cmvpg6jss003bu0r47at6oc3b",
+        "testId": "cmvpg6js6002pu0r4yqghyr6t",
+        "sectionId": "cmvpg6jsc002ru0r4d6x4vz0i",
+        "type": "multiple_choice",
+        "prompt": "Un articolo costa 80 euro. Viene applicato uno sconto del 10%. Calcola lo sconto e il prezzo finale. Scegli la risposta corretta.",
+        "options": [
+          "Sconto $= 8$ euro; prezzo finale $= 72$ euro",
+          "88 euro",
+          "70 euro",
+          "8 euro"
+        ],
+        "correctOption": 0,
+        "points": 4.25,
+        "difficulty": 3,
+        "estimatedMin": 4,
+        "topicId": "cmvpg6jl2001hu0r4yc2e7mh8",
+        "objectives": [
+          "SCI1.PERC.1"
+        ],
+        "solutionSteps": [
+          "Sconto: $80 \\cdot \\dfrac{10}{100} = 8$ euro.",
+          "Prezzo finale: $80 - 8 = 72$ euro.",
+          "Verifica: il prezzo finale è il 90% di quello iniziale."
+        ],
+        "gradingCriteria": [
+          "4{,}25 pt risposta corretta",
+          "0 pt risposta errata o non data"
+        ],
+        "commonErrors": [
+          "Calcolare lo sconto e fermarsi",
+          "Sottrarre la percentuale invece della sua parte",
+          "Errore nel riportare gli euro"
+        ],
+        "hints": [],
+        "answerSpace": "none",
+        "answerLines": 0,
+        "figureSpec": null,
+        "source": "ai",
+        "isLocked": false,
+        "order": 6,
+        "aiGenerated": true,
+        "variantGroup": "g7",
+        "notes": "",
+        "createdAt": "2026-10-26T16:04:56.380Z",
+        "updatedAt": "2026-10-26T16:04:56.380Z",
+        "topic": {
+          "id": "cmvpg6jl2001hu0r4yc2e7mh8",
+          "curriculumId": "cmvpg6jkz000yu0r493pfejje",
+          "parentId": null,
+          "code": "SCI1.PERC",
+          "name": "Numeri e percentuali",
+          "description": "Numeri razionali, percentuali e proporzioni.",
+          "weightHint": 10,
+          "difficultyMin": 1,
+          "difficultyMax": 2,
+          "isCore": true,
+          "order": 6,
+          "createdAt": "2026-10-26T16:04:56.098Z"
+        }
+      },
+      {
+        "id": "cmvpg6jsu003du0r46qtj0c7v",
+        "testId": "cmvpg6js6002pu0r4yqghyr6t",
+        "sectionId": "cmvpg6jsf002xu0r4m46pdwfp",
+        "type": "problem",
+        "prompt": "Un sacchetto contiene 3 palline rosse e 6 palline blu. Estraendo una pallina a caso, qual è la probabilità che sia rossa? Motiva i passaggi e verifica la plausibilità del risultato.",
+        "options": [],
+        "correctOption": null,
+        "points": 30.5,
+        "difficulty": 5,
+        "estimatedMin": 18,
+        "topicId": "cmvpg6jl2001ku0r42nwdhtmk",
+        "objectives": [
+          "SCI1.PROB.2"
+        ],
+        "solutionSteps": [
+          "Casi favorevoli: 3.",
+          "Casi possibili: $3 + 6 = 9$.",
+          "Probabilità: $\\dfrac{3}{9}$."
+        ],
+        "gradingCriteria": [
+          "12{,}25 pt impostazione corretta e dati individuati",
+          "12{,}25 pt procedimento e calcoli corretti",
+          "6 pt risultato e verifica"
+        ],
+        "commonErrors": [
+          "Usare solo le palline di un colore",
+          "Non semplificare la frazione quando richiesto"
+        ],
+        "hints": [],
+        "answerSpace": "lined",
+        "answerLines": 0,
+        "figureSpec": null,
+        "source": "ai",
+        "isLocked": false,
+        "order": 7,
+        "aiGenerated": true,
+        "variantGroup": "g8",
+        "notes": "",
+        "createdAt": "2026-10-26T16:04:56.382Z",
+        "updatedAt": "2026-10-26T16:04:56.382Z",
+        "topic": {
+          "id": "cmvpg6jl2001ku0r42nwdhtmk",
+          "curriculumId": "cmvpg6jkz000yu0r493pfejje",
+          "parentId": null,
+          "code": "SCI1.PROB",
+          "name": "Probabilità e statistica",
+          "description": "Probabilità classica, media e rappresentazione dei dati.",
+          "weightHint": 10,
+          "difficultyMin": 2,
+          "difficultyMax": 3,
+          "isCore": true,
+          "order": 7,
+          "createdAt": "2026-10-26T16:04:56.098Z"
+        }
+      }
+    ],
+    "rubric": {
+      "indicators": [
+        "Conoscenze",
+        "Abilità procedurali",
+        "Risoluzione di problemi",
+        "Linguaggio e argomentazione"
+      ],
+      "levels": [
+        {
+          "level": 1,
+          "label": "Iniziale",
+          "descriptor": "Conoscenze frammentarie e applicazione guidata con errori frequenti."
+        },
+        {
+          "level": 2,
+          "label": "Base",
+          "descriptor": "Conoscenze essenziali e applicazione corretta in situazioni note."
+        },
+        {
+          "level": 3,
+          "label": "Intermedio",
+          "descriptor": "Conoscenze solide, procedure corrette e motivazione adeguata."
+        },
+        {
+          "level": 4,
+          "label": "Avanzato",
+          "descriptor": "Padronanza completa, autonomia, argomentazione rigorosa."
+        }
+      ],
+      "itemMapping": {
+        "cmvpg6jsh002zu0r4nok6md9h": [
+          "Abilità procedurali"
+        ],
+        "cmvpg6jsj0031u0r4vfo9f8an": [
+          "Conoscenze",
+          "Linguaggio e argomentazione"
+        ],
+        "cmvpg6jsl0033u0r42amu2g0n": [
+          "Conoscenze"
+        ],
+        "cmvpg6jsm0035u0r4q4uld8ip": [
+          "Conoscenze"
+        ],
+        "cmvpg6jso0037u0r4x7s5xe74": [
+          "Abilità procedurali",
+          "Risoluzione di problemi"
+        ],
+        "cmvpg6jsq0039u0r4x0aq0i4p": [
+          "Conoscenze",
+          "Linguaggio e argomentazione"
+        ],
+        "cmvpg6jss003bu0r47at6oc3b": [
+          "Conoscenze"
+        ],
+        "cmvpg6jsu003du0r46qtj0c7v": [
+          "Abilità procedurali",
+          "Risoluzione di problemi"
+        ]
+      }
+    }
+  }
+}

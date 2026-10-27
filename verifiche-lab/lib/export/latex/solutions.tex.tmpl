@@ -1,0 +1,30 @@
+<%~ it.preamble %>
+<%~ it.macros %>
+\fancyhead[L]{\small <%= it.instituteTex %>}
+\fancyhead[R]{\small Soluzioni\ --\ <%= it.subjectTex %>}
+
+\begin{document}
+
+\begin{center}
+  {\Large\bfseries Soluzioni}\\[2mm]
+  {\large <%= it.titleTex %>}\\[1.5mm]
+  {\small <%= it.trackTex %>\ --\ Classe <%= it.classTex %>\ --\ <%= it.dateTex %>\ --\ <%= it.pointsTex %> punti}
+\end{center}
+\vspace{1mm}
+\noindent\rule{\linewidth}{0.4pt}
+<% if (it.notesTex) { %>
+\noindent\small <%= it.notesTex %>\par
+<% } %>
+
+<% it.sections.forEach(function (section) { %>
+\titolosezione{<%= section.titleTex %>}
+<% if (section.solutions.length === 0) { %>
+\noindent\emph{Nessun quesito in questa sezione.}
+<% } %>
+<%~ section.solutions.join('\n') %>
+<% }); %>
+
+\vspace{6mm}
+\noindent\small\textit{Documento generato da VerificheLab. La numerazione e i punteggi corrispondono alla verifica.}
+
+\end{document}

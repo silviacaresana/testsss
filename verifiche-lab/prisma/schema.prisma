@@ -1,0 +1,329 @@
+// Schema VerificheLab.
+// Nota: SQLite non supporta enum né array nativi; i campi elenco sono JSON
+// serializzati in String e validati con Zod. Lo schema è portabile su PostgreSQL
+// cambiando solo il provider (vedi docs/decisioni.md, ADR-002).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  passwordHash  String
+  name          String
+  role          String   @default("teacher") // admin | teacher
+  subjects      String   @default("[]") // JSON: ["matematica","fisica"]
+  tracks        String   @default("[]") // JSON: ["classico","scientifico"]
+  createdAt     DateTime @default(now())
+  lastLogin     DateTime?
+
+  sessions       Session[]
+  invites        Invite[]
+  curricula      Curriculum[]
+  tests          Test[]
+  bankEntries    ItemBankEntry[]
+  generationRuns GenerationRun[]
+  auditLogs      AuditLog[]
+  testVersions   TestVersion[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Invite {
+  id          String    @id @default(cuid())
+  email       String
+  role        String    @default("teacher")
+  token       String    @unique
+  expiresAt   DateTime
+  createdById String
+  createdBy   User      @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  usedAt      DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([email])
+}
+
+model Curriculum {
+  id          String    @id @default(cuid())
+  track       String // classico | scientifico
+  year        Int
+  subject     String // matematica | fisica
+  version     Int       @default(1)
+  status      String    @default("bozza") // bozza | pubblicato | archiviato
+  title       String
+  notes       String    @default("")
+  authorId    String
+  author      User      @relation(fields: [authorId], references: [id])
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  topics Topic[]
+  tests  Test[]
+
+  @@unique([track, year, subject, version])
+  @@index([track, year, subject, status])
+}
+
+model Topic {
+  id            String   @id @default(cuid())
+  curriculumId  String
+  curriculum    Curriculum @relation(fields: [curriculumId], references: [id], onDelete: Cascade)
+  parentId      String?
+  parent        Topic?   @relation("TopicTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children      Topic[]  @relation("TopicTree")
+  code          String
+  name          String
+  description   String   @default("")
+  weightHint    Int      @default(10)
+  difficultyMin Int      @default(1)
+  difficultyMax Int      @default(3)
+  isCore        Boolean  @default(true)
+  order         Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  objectives LearningObjective[]
+  items      Item[]
+
+  @@unique([curriculumId, code])
+  @@index([curriculumId, order])
+}
+
+model LearningObjective {
+  id           String   @id @default(cuid())
+  topicId      String
+  topic        Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  code         String
+  text         String
+  prerequisites String  @default("[]") // JSON string[]
+  keywords      String  @default("[]") // JSON string[]
+
+  @@unique([topicId, code])
+}
+
+model Test {
+  id                String    @id @default(cuid())
+  title             String
+  track             String
+  year              Int
+  subject           String
+  classLabel        String    @default("")
+  examDate          DateTime?
+  durationMin       Int
+  totalPoints       Float
+  difficultyTarget  Float     @default(3)
+  calculatorAllowed Boolean   @default(false)
+  formulaSheet      Boolean   @default(false)
+  trigTables        Boolean   @default(false)
+  noDerivatives     Boolean   @default(false)
+  onlyDefinitions   Boolean   @default(false)
+  simplifiedLanguage Boolean  @default(false)
+  answerSpace       Boolean   @default(true)
+  versionLabel      String    @default("A")
+  status            String    @default("bozza") // bozza | approvata
+  seed              Int       @default(0)
+  requestJson       String    @default("{}")
+  styleProfile      String    @default("")
+  aiProvider        String    @default("")
+  aiModel           String    @default("")
+  aiCostEstimate    Float     @default(0)
+  authorId          String
+  author            User      @relation(fields: [authorId], references: [id])
+  curriculumId      String?
+  curriculum        Curriculum? @relation(fields: [curriculumId], references: [id])
+  gradeScaleId      String?
+  gradeScale        GradeScale? @relation(fields: [gradeScaleId], references: [id])
+  parentTestId      String?
+  parentTest        Test?     @relation("TestVariants", fields: [parentTestId], references: [id])
+  variants          Test[]    @relation("TestVariants")
+  isTemplate        Boolean   @default(false)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  sections       Section[]
+  items          Item[]
+  rubric         Rubric?
+  versions       TestVersion[]
+  exports        Export[]
+  generationRuns GenerationRun[]
+  bankEntries    ItemBankEntry[]
+
+  @@index([authorId, createdAt])
+  @@index([track, year, subject])
+  @@index([parentTestId])
+}
+
+model Section {
+  id          String  @id @default(cuid())
+  testId      String
+  test        Test    @relation(fields: [testId], references: [id], onDelete: Cascade)
+  title       String
+  description String  @default("")
+  order       Int     @default(0)
+
+  items Item[]
+
+  @@index([testId, order])
+}
+
+model Item {
+  id                String   @id @default(cuid())
+  testId            String
+  test              Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
+  sectionId         String?
+  section           Section? @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+  type              String
+  prompt            String
+  options           String   @default("[]") // JSON string[]
+  correctOption     Int?
+  points            Float
+  difficulty        Int      @default(3)
+  estimatedMin      Int      @default(5)
+  topicId           String?
+  topic             Topic?   @relation(fields: [topicId], references: [id], onDelete: SetNull)
+  objectives        String   @default("[]")
+  solutionSteps     String   @default("[]")
+  gradingCriteria   String   @default("[]")
+  commonErrors      String   @default("[]")
+  hints             String   @default("[]")
+  answerSpace       String   @default("lined") // none | lined | grid | box
+  answerLines       Int      @default(0)
+  figureSpec        String?  // JSON
+  source            String   @default("ai") // ai | manuale | banca
+  isLocked          Boolean  @default(false)
+  order             Int      @default(0)
+  aiGenerated       Boolean  @default(true)
+  variantGroup      String?
+  notes             String   @default("")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([testId, order])
+}
+
+model GradeScale {
+  id                    String  @id @default(cuid())
+  name                  String
+  totalPoints           Float
+  sufficiencyThreshold  Float
+  mappingJson           String  @default("{\"mode\":\"lineare\"}")
+  isDefault             Boolean @default(false)
+
+  tests Test[]
+}
+
+model Rubric {
+  id              String @id @default(cuid())
+  testId          String @unique
+  test            Test   @relation(fields: [testId], references: [id], onDelete: Cascade)
+  indicatorsJson  String
+  levelsJson      String
+  itemMappingJson String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model ItemBankEntry {
+  id                String   @id @default(cuid())
+  itemSnapshotJson  String
+  visibility        String   @default("dipartimento") // privato | dipartimento | pubblico interno
+  ownerId           String
+  owner             User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  rating            Float    @default(0)
+  ratingCount       Int      @default(0)
+  tagsJson          String   @default("[]")
+  notes             String   @default("")
+  usageCount        Int      @default(0)
+  sourceTestId      String?
+  sourceTest        Test?    @relation(fields: [sourceTestId], references: [id], onDelete: SetNull)
+  createdAt         DateTime @default(now())
+
+  @@index([visibility, createdAt])
+  @@index([ownerId])
+}
+
+model GenerationRun {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  testId           String?
+  test             Test?    @relation(fields: [testId], references: [id], onDelete: SetNull)
+  provider         String
+  model            String
+  promptTokens     Int      @default(0)
+  completionTokens Int      @default(0)
+  costEstimate     Float    @default(0)
+  durationMs       Int      @default(0)
+  status           String   @default("ok") // ok | errore | riparata
+  errorsJson       String   @default("[]")
+  promptExcerpt    String?
+  createdAt        DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([createdAt])
+}
+
+model Export {
+  id           String   @id @default(cuid())
+  testId       String
+  test         Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
+  format       String // tex | pdf | zip | json
+  kind         String   @default("verifica") // verifica | soluzioni | griglia | pacchetto
+  filePath     String   @default("")
+  engine       String   @default("")
+  engineVersion String  @default("")
+  status       String   @default("ok") // ok | errore
+  logExcerpt   String   @default("")
+  createdAt    DateTime @default(now())
+
+  @@index([testId, createdAt])
+}
+
+model TestVersion {
+  id           String   @id @default(cuid())
+  testId       String
+  test         Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
+  version      Int
+  label        String   @default("")
+  snapshotJson String
+  createdById  String
+  createdBy    User     @relation(fields: [createdById], references: [id])
+  createdAt    DateTime @default(now())
+
+  @@unique([testId, version])
+  @@index([testId, createdAt])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String
+  entity    String
+  entityId  String   @default("")
+  metaJson  String   @default("{}")
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}

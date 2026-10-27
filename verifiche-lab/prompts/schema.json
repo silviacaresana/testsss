@@ -1,0 +1,83 @@
+{
+  "type": "object",
+  "required": ["meta", "sections", "items", "rubric"],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["title", "track", "year", "subject", "duration_min", "total_points", "difficulty_target", "calculator_allowed"],
+      "properties": {
+        "title": { "type": "string" },
+        "track": { "enum": ["classico", "scientifico"] },
+        "year": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "subject": { "enum": ["matematica", "fisica"] },
+        "duration_min": { "type": "number" },
+        "total_points": { "type": "number" },
+        "difficulty_target": { "type": "number", "minimum": 1, "maximum": 5 },
+        "calculator_allowed": { "type": "boolean" }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "description"],
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "prompt", "points", "difficulty", "estimated_min", "topic_code", "solution_steps", "grading_criteria"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "section_id": { "type": ["string", "null"] },
+          "type": { "enum": ["multiple_choice", "true_false", "short_answer", "open_answer", "exercise", "problem", "graph", "lab_data", "proof"] },
+          "prompt": { "type": "string" },
+          "options": { "type": "array", "items": { "type": "string" } },
+          "correct_option": { "type": ["integer", "null"], "minimum": 0 },
+          "points": { "type": "number", "multipleOf": 0.25 },
+          "difficulty": { "type": "integer", "minimum": 1, "maximum": 5 },
+          "estimated_min": { "type": "number" },
+          "topic_code": { "type": "string" },
+          "objectives": { "type": "array", "items": { "type": "string" } },
+          "solution_steps": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+          "grading_criteria": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+          "common_errors": { "type": "array", "items": { "type": "string" } },
+          "hints": { "type": "array", "items": { "type": "string" } },
+          "answer_space": { "enum": ["none", "lined", "grid", "box"] },
+          "figure_spec": { "type": ["object", "null"] },
+          "is_locked": { "type": "boolean" }
+        }
+      }
+    },
+    "rubric": {
+      "type": "object",
+      "required": ["indicators", "item_mapping", "levels"],
+      "properties": {
+        "indicators": { "type": "array", "items": { "type": "string" } },
+        "item_mapping": { "type": "object", "additionalProperties": { "type": "array", "items": { "type": "string" } } },
+        "levels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["level", "label", "descriptor"],
+            "properties": {
+              "level": { "type": "integer", "minimum": 1, "maximum": 6 },
+              "label": { "type": "string" },
+              "descriptor": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

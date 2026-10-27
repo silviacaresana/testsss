@@ -1,0 +1,199 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[italian]{babel}
+\usepackage[a4paper,top=1.8cm,bottom=1.8cm,left=2cm,right=2cm,headheight=15pt]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{pgffor}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage{needspace}
+\usepackage{array}
+\usepackage{textcomp}
+\usepackage{pdflscape}
+\usepackage[hidelinks]{hyperref}
+\sisetup{output-decimal-marker={,},group-separator={.},per-mode=symbol}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{2pt}
+\setlist[enumerate]{itemsep=6pt,topsep=4pt,leftmargin=8mm}
+\setlist[itemize]{itemsep=2pt,topsep=3pt,leftmargin=6mm}
+\raggedbottom
+
+% Comandi personalizzati: modifica qui la grafica senza toccare il codice.
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancyfoot[C]{\small Pag. \thepage\ di \pageref{LastPage}}
+
+% Punteggio a destra della consegna.
+\newcommand{\punti}[1]{\hfill\textbf{[#1~pt]}}
+
+% Riga puntinata per lo svolgimento.
+\newcommand{\riga}{\noindent\makebox[\linewidth]{\dotfill}\par\vspace{4mm}}
+
+% N righe puntinate (se N = 0 non stampa nulla: il chiamante evita il caso).
+\newcommand{\rispostarighe}[1]{\par\vspace{1mm}\foreach \i in {1,...,#1}{\riga}}
+
+% Riquadro per la risposta.
+\newcommand{\riquadro}{\par\noindent\framebox[\linewidth]{\rule{0pt}{2.6cm}}\par}
+
+% Griglia quadrettata per grafici e disegni.
+\newcommand{\griglia}{\par\noindent
+  \begin{tikzpicture}[x=0.55cm,y=0.55cm]
+    \draw[step=1,lightgray,very thin] (0,0) grid (16,10);
+    \draw[black!60,thick] (0,0) rectangle (16,10);
+  \end{tikzpicture}\par}
+
+% Piano cartesiano con assi e scala.
+\newcommand{\grigliacartesiana}{\par\noindent
+  \begin{tikzpicture}[x=0.55cm,y=0.55cm]
+    \draw[step=1,lightgray,very thin] (0,0) grid (16,10);
+    \draw[->,thick] (0,5) -- (16,5) node[right] {\small $x$};
+    \draw[->,thick] (8,0) -- (8,10) node[above] {\small $y$};
+    \foreach \x in {2,4,6,10,12,14} \draw (\x,4.8) -- (\x,5.2);
+    \foreach \y in {1,3,7,9} \draw (7.8,\y) -- (8.2,\y);
+  \end{tikzpicture}\par}
+
+% Intestazione della verifica: istituto, indirizzo, materia, classe, data, tempo, punti, soglia.
+\newcommand{\intestazione}[8]{%
+  \begin{center}
+    {\large\bfseries #1}\\[1mm]
+    {\small #2\ --\ #3}\\[3mm]
+    {\Large\bfseries #4}\\[3mm]
+    \begin{tabular}{@{}p{0.48\textwidth}p{0.48\textwidth}@{}}
+      Classe: #5 & Data: #6 \\
+      Tempo: #7 & Punteggio: #8 \\
+    \end{tabular}
+  \end{center}
+}
+
+% Titolo di sezione con spazio garantito.
+\newcommand{\titolosezione}[1]{\par\needspace{4\baselineskip}\section*{#1}\vspace{-1mm}}
+
+% Blocco soluzione.
+\newcommand{\soluzione}[1]{\par\noindent #1\par}
+
+% Casella per gli errori comuni (soluzioni).
+\newcommand{\erroricomuni}[1]{%
+  \par\smallskip
+  \noindent\fcolorbox{black!25}{black!3}{%
+    \begin{minipage}{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}
+      \small\textbf{Errori comuni attesi:} #1
+    \end{minipage}}\par\smallskip
+}
+
+
+\begin{document}
+
+\fancyhead[L]{\small Liceo Statale di Esempio}
+\fancyhead[R]{\small Matematica\ --\ 12/11/2026}
+
+\intestazione{Liceo Statale di Esempio}{Liceo Scientifico}{Matematica}{Verifica dimostrativa --- Funzioni e problemi (1\textsuperscript{a} Scientifico)}{1\textsuperscript{a} B}{12/11/2026}{60}{100}
+
+
+
+
+\noindent Nome e cognome: \dotfill \hfill Classe: 1\textsuperscript{a} B \hfill Voto: \dotfill
+\par\vspace{1mm}
+\noindent\rule{\linewidth}{0.4pt}
+\par\vspace{1mm}
+
+\noindent\small Non è consentito l'uso della calcolatrice. Scrivi lo svolgimento negli spazi indicati.\par\vspace{2mm}
+
+
+
+\titolosezione{Quesiti a risposta chiusa}
+
+\noindent\small Una sola risposta corretta.\par\vspace{1mm}
+
+\begin{enumerate}[label=\arabic*),start=1]
+\needspace{5\baselineskip}
+\item Trova il valore di $x$ che rende vera l'uguaglianza $2x - 8 = 6$. Scegli la risposta corretta. \punti{4,25}
+\begin{enumerate}[label=\Alph*),itemsep=1pt,topsep=2pt,leftmargin=7mm]
+
+  \item $x = 6$
+
+  \item $x = 7$
+
+  \item $x = 8$
+
+  \item $x = -7$
+
+\end{enumerate}
+
+\needspace{5\baselineskip}
+\item Vero o falso? «Il risultato corretto è $y = -1$». Motiva la risposta. \hfill Vero $\square$ \quad Falso $\square$ \punti{4,25}
+
+\needspace{5\baselineskip}
+\item Un articolo costa 80 euro. Viene applicato uno sconto del 10\%. Calcola lo sconto e il prezzo finale. Scegli la risposta corretta. \punti{4,25}
+\begin{enumerate}[label=\Alph*),itemsep=1pt,topsep=2pt,leftmargin=7mm]
+
+  \item Sconto $= 8$ euro; prezzo finale $= 72$ euro
+
+  \item 88 euro
+
+  \item 70 euro
+
+  \item 8 euro
+
+\end{enumerate}
+
+\end{enumerate}
+
+\titolosezione{Quesiti a risposta breve}
+
+\begin{enumerate}[label=\arabic*),resume]
+\needspace{7\baselineskip}
+\item Determina la soluzione dell'equazione $3x + 2 = 20$, motivando i passaggi. Scrivi il risultato e una breve giustificazione. \punti{6,5}
+
+\rispostarighe{8}
+
+
+\needspace{5\baselineskip}
+\item Trova il valore di $x$ che rende vera l'uguaglianza $5x - 2 = 23$. Scrivi il risultato e una breve giustificazione. \punti{6,5}
+
+\rispostarighe{3}
+
+
+\end{enumerate}
+
+\titolosezione{Esercizi}
+
+\begin{enumerate}[label=\arabic*),resume]
+\needspace{8\baselineskip}
+\item Scomponi il trinomio $x^2 + 2x - 3$. Verifica il risultato ottenuto. \punti{13}
+
+
+\rispostarighe{10}
+
+
+\end{enumerate}
+
+\titolosezione{Problemi e dimostrazioni}
+
+\begin{enumerate}[label=\arabic*),resume]
+\needspace{12\baselineskip}
+\item Un giardino rettangolare è lungo $4\,\mathrm{m}$ e largo $10\,\mathrm{m}$. Quanti metri di recinzione servono e qual è la sua area? \punti{30,75}
+
+
+\rispostarighe{18}
+
+
+\needspace{12\baselineskip}
+\item Un sacchetto contiene 3 palline rosse e 6 palline blu. Estraendo una pallina a caso, qual è la probabilità che sia rossa? Motiva i passaggi e verifica la plausibilità del risultato. \punti{30,5}
+
+
+\rispostarighe{18}
+
+
+\end{enumerate}
+
+
+\end{document}

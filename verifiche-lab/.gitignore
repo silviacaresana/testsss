@@ -1,0 +1,55 @@
+# Dipendenze
+node_modules/
+.pnp
+.pnp.js
+
+# Build
+.next/
+out/
+build/
+dist/
+next-env.d.ts
+*.tsbuildinfo
+
+# Ambiente e segreti
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Database locale
+prisma/dev.db
+prisma/dev.db-journal
+data/
+*.sqlite
+*.sqlite3
+
+# Storage generato
+storage/
+exports/
+tmp/
+uploads/
+
+# PDF di prova generati fuori da examples/
+*.pdf
+!examples/**/*.pdf
+!docs/**/*.pdf
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Log e test
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+coverage/
+playwright-report/
+test-results/
+.vitest/
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea/

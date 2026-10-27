@@ -1,0 +1,212 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 42 33% 97%;
+    --foreground: 215 28% 17%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 28% 17%;
+    --border: 40 15% 86%;
+    --input: 40 15% 80%;
+    --ring: 160 45% 24%;
+    --primary: 160 45% 22%;
+    --primary-foreground: 45 60% 97%;
+    --secondary: 45 38% 92%;
+    --secondary-foreground: 215 28% 20%;
+    --muted: 42 25% 93%;
+    --muted-foreground: 215 12% 42%;
+    --accent: 32 82% 50%;
+    --accent-foreground: 30 60% 12%;
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 100%;
+    --radius: 0.75rem;
+    --font-sans: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-sans);
+    background-image:
+      radial-gradient(circle at 12% 0%, hsl(160 40% 94%) 0%, transparent 38%),
+      radial-gradient(circle at 92% 8%, hsl(38 60% 94%) 0%, transparent 36%);
+    background-attachment: fixed;
+  }
+
+  h1, h2, h3, .font-serif {
+    font-family: Georgia, "Iowan Old Style", Cambria, serif;
+    letter-spacing: -0.015em;
+  }
+
+  ::selection {
+    background: hsl(var(--accent) / 0.25);
+  }
+}
+
+@layer components {
+  .surface {
+    @apply rounded-xl border bg-card shadow-[0_1px_0_rgba(28,36,48,0.04),0_16px_40px_-32px_rgba(28,36,48,0.35)];
+  }
+
+  .kicker {
+    @apply text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground;
+  }
+
+  .prose-school p {
+    @apply text-[15px] leading-relaxed text-muted-foreground;
+  }
+
+  .input-base {
+    @apply h-10 w-full rounded-lg border border-input bg-white px-3 text-sm shadow-sm outline-none transition placeholder:text-muted-foreground/60 focus:border-primary focus:ring-2 focus:ring-primary/15 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .label-base {
+    @apply mb-1.5 block text-[13px] font-medium text-foreground;
+  }
+
+  .hint {
+    @apply mt-1 text-xs text-muted-foreground;
+  }
+
+  .table-base {
+    @apply w-full text-left text-sm;
+  }
+
+  .table-base thead th {
+    @apply border-b px-3 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground;
+  }
+
+  .table-base tbody td {
+    @apply border-b border-border/60 px-3 py-3 align-middle;
+  }
+
+  .table-base tbody tr:last-child td {
+    @apply border-b-0;
+  }
+
+  .table-base tbody tr:hover {
+    @apply bg-muted/40;
+  }
+}
+
+/* Anteprima della verifica: stile "carta" */
+.preview-paper {
+  font-family: Georgia, "Times New Roman", serif;
+  color: #1a1a1a;
+  line-height: 1.55;
+}
+
+.preview-paper h1 {
+  font-size: 1.35rem;
+  text-align: center;
+  margin: 0 0 0.35rem;
+}
+
+.preview-paper .paper-meta {
+  text-align: center;
+  font-size: 0.82rem;
+  color: #444;
+  margin-bottom: 1rem;
+}
+
+.preview-paper table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+  margin: 0.6rem 0 1rem;
+}
+
+.preview-paper th,
+.preview-paper td {
+  border: 1px solid #888;
+  padding: 0.3rem 0.4rem;
+  vertical-align: top;
+}
+
+.preview-paper .paper-section {
+  margin-top: 1.1rem;
+  font-weight: 700;
+  border-bottom: 1px solid #bbb;
+  padding-bottom: 0.2rem;
+}
+
+.preview-paper .paper-item {
+  margin-top: 0.85rem;
+  break-inside: avoid;
+}
+
+.preview-paper .paper-item-head {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+
+.preview-paper .paper-item-head .num {
+  font-weight: 700;
+}
+
+.preview-paper .paper-item-head .pts {
+  margin-left: auto;
+  font-size: 0.78rem;
+  color: #555;
+}
+
+.preview-paper .paper-options {
+  margin: 0.3rem 0 0 1.4rem;
+  font-size: 0.92rem;
+  list-style: upper-alpha;
+}
+
+.preview-paper .paper-lines {
+  margin-top: 0.45rem;
+  border-bottom: 1px dashed #aaa;
+  height: 1.6rem;
+}
+
+.preview-paper .paper-figure {
+  margin: 0.5rem 0;
+  text-align: center;
+}
+
+.preview-paper .paper-figure svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.preview-paper .katex {
+  font-size: 1em;
+}
+
+.preview-paper .paper-solution {
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.preview-paper .paper-solution ol {
+  list-style: decimal;
+  margin-left: 1.2rem;
+}
+
+.log-scroll {
+  max-height: 22rem;
+  overflow: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: white !important; }
+  .preview-paper { box-shadow: none; border: 0; }
+}

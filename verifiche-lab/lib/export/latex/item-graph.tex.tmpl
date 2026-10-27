@@ -1,0 +1,7 @@
+\needspace{<%= it.needspace %>\baselineskip}
+\item <%= it.promptTex %> \punti{<%= it.pointsTex %>}
+<% if (it.figureTikz) { %>
+<%~ it.figureTikz %>
+<% } else { %>
+\grigliacartesiana
+<% } %>

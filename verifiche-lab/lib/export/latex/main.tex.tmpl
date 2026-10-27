@@ -1,0 +1,31 @@
+<%~ it.preamble %>
+<%~ it.macros %>
+<% if (it.logoFile) { %>
+<% } %>
+\begin{document}
+
+<%~ it.header %>
+
+<% if (it.formulaSheet) { %>
+\noindent\fbox{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}{\small\textbf{Formulario consentito:} <%= it.formulaSheetText %>}}\par\vspace{2mm}
+<% } %>
+
+\noindent Nome e cognome: \dotfill \hfill Classe: <%= it.classTex %> \hfill Voto: \dotfill
+\par\vspace{1mm}
+\noindent\rule{\linewidth}{0.4pt}
+\par\vspace{1mm}
+<% if (it.instructions) { %>
+\noindent\small <%= it.instructions %>\par\vspace{2mm}
+<% } %>
+
+<% it.sections.forEach(function (section, index) { %>
+\titolosezione{<%= section.titleTex %>}
+<% if (section.descriptionTex) { %>
+\noindent\small <%= section.descriptionTex %>\par\vspace{1mm}
+<% } %>
+\begin{enumerate}[label=\arabic*),<%= index === 0 ? 'start=1' : 'resume' %>]
+<%~ section.blocks.join('\n') %>
+\end{enumerate}
+<% }); %>
+
+\end{document}

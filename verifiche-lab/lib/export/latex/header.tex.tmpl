@@ -1,0 +1,8 @@
+\fancyhead[L]{\small <%= it.instituteTex %>}
+\fancyhead[R]{\small <%= it.subjectTex %>\ --\ <%= it.dateTex %>}
+<% if (it.logoFile) { %>
+\begin{center}
+  \includegraphics[height=1.3cm]{<%= it.logoFile %>}
+\end{center}
+<% } %>
+\intestazione{<%= it.instituteTex %>}{<%= it.trackTex %>}{<%= it.subjectTex %>}{<%= it.titleTex %>}{<%= it.classTex %>}{<%= it.dateTex %>}{<%= it.durationTex %>}{<%= it.pointsTex %>}

@@ -1,0 +1,97 @@
+<%~ it.preamble %>
+<%~ it.macros %>
+\fancyhead[L]{\small <%= it.instituteTex %>}
+\fancyhead[R]{\small Griglia di valutazione}
+
+\begin{document}
+
+\begin{center}
+  {\Large\bfseries Griglia di valutazione}\\[2mm]
+  {\large <%= it.titleTex %>}\\[1.5mm]
+  {\small <%= it.trackTex %>\ --\ Classe <%= it.classTex %>\ --\ <%= it.dateTex %>\ --\ Durata <%= it.durationTex %> minuti}
+\end{center}
+\vspace{1mm}
+\noindent\rule{\linewidth}{0.4pt}
+
+\section*{Dati della prova}
+\begin{center}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Punteggio totale & <%= it.pointsTex %> & Soglia di sufficienza & <%= it.thresholdTex %>\,\% \\
+Numero di quesiti & <%= it.itemCount %> & Tempo assegnato & <%= it.durationTex %> minuti \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section*{Indicatori e livelli}
+<% it.levels.forEach(function (level) { %>
+\noindent\textbf{Livello <%= level.level %> -- <%= level.labelTex %>:} \small <%= level.descriptorTex %>\normalsize\par\vspace{1mm}
+<% }); %>
+
+\begin{landscape}
+\section*{Descrittori per indicatore}
+\small
+\begin{longtable}{@{}p{2.3cm}p{4.3cm}p{4.3cm}p{4.3cm}p{4.3cm}@{}}
+\toprule
+\textbf{Indicatore} & \textbf{Livello 1} & \textbf{Livello 2} & \textbf{Livello 3} & \textbf{Livello 4} \\
+\midrule
+\endhead
+<% it.indicatorRows.forEach(function (row) { %>
+\textbf{<%= row.indicatorTex %>} & <%= row.level1Tex %> & <%= row.level2Tex %> & <%= row.level3Tex %> & <%= row.level4Tex %> \\
+\addlinespace
+<% }); %>
+\bottomrule
+\end{longtable}
+\end{landscape}
+
+\section*{Punteggi per indicatore}
+\begin{center}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+\textbf{Indicatore} & \textbf{Punti disponibili} & \textbf{Percentuale} \\
+\midrule
+<% it.indicatorTotals.forEach(function (row) { %>
+<%= row.indicatorTex %> & <%= row.pointsTex %> & <%= row.percentTex %>\,\% \\
+<% }); %>
+\midrule
+\textbf{Totale} & \textbf{<%= it.pointsTex %>} & \textbf{100}\,\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section*{Mappatura dei quesiti}
+{\small
+\begin{longtable}{@{}p{0.7cm}p{2.1cm}p{1.2cm}p{3.9cm}p{5.8cm}@{}}
+\toprule
+\textbf{N.} & \textbf{Tipologia} & \textbf{Punti} & \textbf{Indicatori} & \textbf{Criteri di attribuzione} \\
+\midrule
+\endhead
+<% it.itemRows.forEach(function (row) { %>
+<%= row.number %> & <%= row.typeTex %> & <%= row.pointsTex %> & <%= row.indicatorsTex %> & <%= row.criteriaTex %> \\
+\addlinespace
+<% }); %>
+\bottomrule
+\end{longtable}
+}
+
+\section*{Conversione punteggio -- voto}
+\begin{center}
+\small
+\begin{longtable}{@{}rrr@{}}
+\toprule
+\textbf{Punteggio} & \textbf{Percentuale} & \textbf{Voto (decimi)} \\
+\midrule
+\endhead
+<% it.gradeRows.forEach(function (row) { %>
+<% if (row.isThreshold) { %>\midrule<% } %>
+<%= row.scoreTex %> & <%= row.percent %>\,\% & \textbf{<%= row.gradeTex %>} \\
+<% }); %>
+\bottomrule
+\end{longtable}
+\end{center}
+\noindent\small Soglia di sufficienza: <%= it.thresholdTex %>\,\% del punteggio totale (<%= it.thresholdPointsTex %> punti) $\Rightarrow$ voto 6.
+
+\vspace{8mm}
+\noindent Data: \dotfill \hfill Firma del docente: \dotfill
+
+\end{document}

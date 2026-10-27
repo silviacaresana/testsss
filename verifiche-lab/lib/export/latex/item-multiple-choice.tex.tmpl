@@ -1,0 +1,7 @@
+\needspace{<%= it.needspace %>\baselineskip}
+\item <%= it.promptTex %> \punti{<%= it.pointsTex %>}
+\begin{enumerate}[label=\Alph*),itemsep=1pt,topsep=2pt,leftmargin=7mm]
+<% it.optionsTex.forEach(function (option) { %>
+  \item <%= option %>
+<% }); %>
+\end{enumerate}

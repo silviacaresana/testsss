@@ -1,0 +1,25 @@
+\needspace{9\baselineskip}
+\subsection*{Quesito <%= it.number %>\hfill\normalsize\mdseries [<%= it.pointsTex %>~pt]}
+<% if (it.topicTex) { %>
+{\small \textit{Argomento:} <%= it.topicTex %>}\par\vspace{1mm}
+<% } %>
+<% if (it.correctLetter) { %>
+\noindent\textbf{Risposta corretta:} <%= it.correctLetter %>.\par\vspace{1mm}
+<% } %>
+<% if (it.introTex) { %>
+<%= it.introTex %>
+<% } %>
+\begin{enumerate}[label=\arabic*)]
+<% it.solutionStepsTex.forEach(function (step) { %>
+  \item <%= step %>
+<% }); %>
+\end{enumerate}
+\noindent\textbf{Criteri di punteggio:}
+\begin{itemize}
+<% it.criteriaTex.forEach(function (criterion) { %>
+  \item <%= criterion %>
+<% }); %>
+\end{itemize}
+<% if (it.errorsTex.length > 0) { %>
+\erroricomuni{<%= it.errorsTex.join('; ') %>}
+<% } %>
