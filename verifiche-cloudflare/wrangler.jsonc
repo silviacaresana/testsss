@@ -1,0 +1,39 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "verifiche",
+  "main": "src/worker.js",
+  "compatibility_date": "2025-10-01",
+
+  // Tutto passa dal Worker (anche i file statici), così la protezione Access
+  // vale per ogni pagina e per ogni API.
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  },
+
+  // Dopo `npx wrangler d1 create verifiche` incolla qui il database_id.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "verifiche",
+      "database_id": "INCOLLA-QUI-IL-DATABASE-ID",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  "vars": {
+    // Cloudflare Access (vedi README, sezione "Proteggere il sito").
+    // Finché mancano, l'app risponde 503 e non mostra nulla: è voluto.
+    "ACCESS_TEAM_DOMAIN": "",
+    "ACCESS_AUD": "",
+    // Metti "true" SOLO per una prova rapida: rende il sito aperto a chiunque.
+    "ALLOW_PUBLIC": "false",
+    // Nome dell'istituto precompilato nelle nuove verifiche (opzionale).
+    "INSTITUTE_NAME": "",
+    // Modello usato dalla bozza con AI (serve il segreto ANTHROPIC_API_KEY).
+    "AI_MODEL": "claude-sonnet-5-5"
+  },
+
+  "observability": { "enabled": true }
+}

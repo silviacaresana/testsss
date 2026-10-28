@@ -349,7 +349,7 @@ function exportJsonPayload(test: TestForExport) {
   };
 }
 
-const previewCache = new Map<string, { at: number; pdf: Buffer | null; html: string; log: string }>();
+const previewCache = new Map<string, { at: number; pdf: Buffer | null; html: string; log: string; available: boolean }>();
 
 function previewKey(test: TestForExport, kind: string): string {
   const itemStamp = test.items.reduce((max, item) => Math.max(max, item.updatedAt.getTime()), 0);
@@ -372,7 +372,7 @@ export async function previewTest(
   const key = previewKey(test, kind);
   const cached = previewCache.get(key);
   if (cached && Date.now() - cached.at < 10 * 60 * 1000) {
-    return { pdf: cached.pdf, html: cached.html, log: cached.log, engineAvailable: true };
+    return { pdf: cached.pdf, html: cached.html, log: cached.log, engineAvailable: cached.available };
   }
   const { name: instituteName, logoPath } = await getInstituteSettings();
   const docs = docsFor(test, instituteName, logoPath || null);
@@ -386,6 +386,7 @@ export async function previewTest(
     pdf: compile?.ok ? compile.pdf : null,
     html,
     log: compile?.log ?? availability.message,
+    available: availability.ok,
   };
   previewCache.set(key, result);
   if (previewCache.size > 24) {

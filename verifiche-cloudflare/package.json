@@ -1,0 +1,21 @@
+{
+  "name": "verifiche-cloudflare",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Creazione e archivio di verifiche scolastiche su Cloudflare Workers + D1, senza account nell'app.",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "dev": "node dev/server.mjs",
+    "dev:wrangler": "wrangler dev",
+    "test": "node --test \"test/*.test.js\"",
+    "db:migrate:local": "wrangler d1 migrations apply verifiche --local",
+    "db:migrate:remote": "wrangler d1 migrations apply verifiche --remote",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

@@ -489,15 +489,13 @@ export function GenerateWizard({
         <Card>
           <CardBody className="py-12 text-center">
             <BookOpen className="mx-auto h-8 w-8 text-muted-foreground/60" />
-            <h1 className="mt-3 text-xl font-semibold">Serve prima un programma pubblicato</h1>
+            <h1 className="mt-3 text-xl font-semibold">Nessun programma disponibile</h1>
             <p className="mx-auto mt-2 max-w-lg text-[13.5px] leading-relaxed text-muted-foreground">
-              Il generatore costruisce ogni verifica a partire dai topic e dagli obiettivi del dipartimento.
-              Crea un programma per il tuo indirizzo, anno e materia, oppure chiedi al referente di pubblicarlo.
+              Il generatore costruisce ogni verifica a partire dai programmi caricati nell&apos;app (file
+              lib/seed-data.ts). Ricarica la pagina: se il problema persiste, controlla il collegamento al
+              database.
             </p>
             <div className="mt-5 flex justify-center gap-2">
-              <ButtonLink href="/programmi" variant="outline">
-                Vai ai programmi
-              </ButtonLink>
               <ButtonLink href="/verifiche">Torna alle verifiche</ButtonLink>
             </div>
           </CardBody>

@@ -11,7 +11,6 @@ import {
   Eye,
   GitBranch,
   History,
-  Library,
   ListChecks,
   MoreVertical,
   Plus,
@@ -25,15 +24,14 @@ import {
 import { apiFetch, ApiError } from "@/lib/client/api";
 import type { SerializedItem, SerializedTest } from "@/lib/tests/repository";
 import { formatDateIT, formatDateTimeIT, cn } from "@/lib/utils";
-import { subjectLabel, trackLabel, VISIBILITIES } from "@/lib/constants";
+import { subjectLabel, trackLabel } from "@/lib/constants";
 import { Badge, StatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, EmptyState } from "@/components/ui/card";
-import { Field, Input, Select, Textarea } from "@/components/ui/field";
+import { Field, Select } from "@/components/ui/field";
 import { Modal } from "@/components/ui/modal";
 import { Notice } from "@/components/ui/notice";
 import { Breadcrumbs } from "@/components/ui/page-header";
-import { BankPicker } from "@/components/editor/bank-picker";
 import { ExportPanel } from "@/components/editor/export-panel";
 import { ItemCard } from "@/components/editor/item-card";
 import { PreviewPanel } from "@/components/editor/preview-panel";
@@ -79,9 +77,6 @@ export function TestEditor({
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [newBanner, setNewBanner] = useState(isNew);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [bankOpen, setBankOpen] = useState(false);
-  const [bankItem, setBankItem] = useState<SerializedItem | null>(null);
-  const [bankForm, setBankForm] = useState({ visibility: "dipartimento", tags: "", notes: "" });
   const [deleteItemTarget, setDeleteItemTarget] = useState<SerializedItem | null>(null);
   const [deleteTestOpen, setDeleteTestOpen] = useState(false);
   const [variantOpen, setVariantOpen] = useState(false);
@@ -314,27 +309,6 @@ export function TestEditor({
     router.push("/verifiche");
   }
 
-  async function saveToBank() {
-    if (!bankItem) return;
-    const result = await run("bank-save", () =>
-      apiFetch(`/api/tests/${test.id}/items/${bankItem.id}/bank`, {
-        method: "POST",
-        body: {
-          visibility: bankForm.visibility,
-          tags: bankForm.tags
-            .split(",")
-            .map((tag) => tag.trim())
-            .filter(Boolean)
-            .slice(0, 15),
-          notes: bankForm.notes,
-        },
-      }),
-    );
-    if (result === undefined) return;
-    setBankItem(null);
-    success("Quesito salvato nella banca: sarà riutilizzabile nelle prossime verifiche.");
-  }
-
   const sections = [...test.sections].sort((a, b) => a.order - b.order);
   const sectionIds = new Set(sections.map((section) => section.id));
   const orphanItems = ordered.filter((item) => !item.sectionId || !sectionIds.has(item.sectionId));
@@ -402,16 +376,7 @@ export function TestEditor({
           </div>
           <p className="mt-2 text-[12px] text-muted-foreground">
             {test.authorName}
-            {test.curriculumTitle ? (
-              <>
-                {" · "}
-                <Link href={test.curriculumId ? `/programmi/${test.curriculumId}` : "/programmi"} className="hover:text-foreground">
-                  {test.curriculumTitle}
-                </Link>
-              </>
-            ) : (
-              " · senza programma collegato"
-            )}
+            {test.curriculumTitle ? ` · ${test.curriculumTitle}` : " · senza programma collegato"}
             {test.examDate ? ` · prova del ${formatDateIT(test.examDate)}` : ""} · aggiornata {formatDateTimeIT(test.updatedAt)}
           </p>
         </div>
@@ -556,12 +521,6 @@ export function TestEditor({
               {test.items.length} quesiti · {formatPoints(totals.points)} pt · {totals.minutes} min stimati
             </p>
             <div className="flex flex-wrap gap-2">
-              {canEdit ? (
-                <Button type="button" variant="outline" size="sm" onClick={() => setBankOpen(true)}>
-                  <Library className="h-3.5 w-3.5" />
-                  Aggiungi dalla banca
-                </Button>
-              ) : null}
               {canEdit && !balanced ? (
                 <Button type="button" size="sm" loading={busy === "rebalance"} onClick={() => void rebalance()}>
                   <Scale className="h-3.5 w-3.5" />
@@ -592,12 +551,15 @@ export function TestEditor({
                 <EmptyState
                   icon={<Sparkles className="h-6 w-6" />}
                   title="Nessun quesito"
-                  description="Aggiungi un quesito dalla banca oppure torna alla generazione per creare una nuova bozza."
+                  description="Torna alla generazione per creare una nuova bozza."
                   action={
-                    <Button type="button" size="sm" onClick={() => setBankOpen(true)}>
+                    <Link
+                      href="/verifiche/nuova"
+                      className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3 text-[12px] font-semibold text-primary-foreground"
+                    >
                       <Plus className="h-3.5 w-3.5" />
-                      Aggiungi dalla banca
-                    </Button>
+                      Nuova verifica
+                    </Link>
                   }
                 />
               </CardBody>
@@ -635,10 +597,6 @@ export function TestEditor({
                       onDuplicate={duplicateItem}
                       onRegenerate={regenerateItem}
                       onToggleLock={toggleLock}
-                      onSaveToBank={(entry) => {
-                        setBankItem(entry);
-                        setBankForm({ visibility: "dipartimento", tags: "", notes: "" });
-                      }}
                       onMove={moveItem}
                     />
                   ))}
@@ -670,10 +628,6 @@ export function TestEditor({
                     onDuplicate={duplicateItem}
                     onRegenerate={regenerateItem}
                     onToggleLock={toggleLock}
-                    onSaveToBank={(entry) => {
-                      setBankItem(entry);
-                      setBankForm({ visibility: "dipartimento", tags: "", notes: "" });
-                    }}
                     onMove={moveItem}
                   />
                 ))}
@@ -728,20 +682,6 @@ export function TestEditor({
         onSuccess={success}
       />
 
-      <BankPicker
-        open={bankOpen}
-        testId={test.id}
-        onClose={() => setBankOpen(false)}
-        onAdded={(next) => {
-          applyTest(next);
-          setFeedback({
-            tone: "warning",
-            message: "Quesito aggiunto dalla banca. Usa «Riequilibra punti» per riallineare il totale.",
-          });
-        }}
-        onError={fail}
-      />
-
       <Modal
         open={Boolean(deleteItemTarget)}
         onClose={() => setDeleteItemTarget(null)}
@@ -766,55 +706,6 @@ export function TestEditor({
         <p className="mt-2 text-[11.5px] text-muted-foreground">
           L&apos;eliminazione crea una nuova versione: potrai ripristinare lo stato precedente dalla scheda Versioni.
         </p>
-      </Modal>
-
-      <Modal
-        open={Boolean(bankItem)}
-        onClose={() => setBankItem(null)}
-        title="Salva nella banca quesiti"
-        description="Il quesito conserva testo, soluzione, criteri e punti. Potrai riutilizzarlo in altre verifiche."
-        footer={
-          <>
-            <Button type="button" variant="outline" onClick={() => setBankItem(null)}>
-              Annulla
-            </Button>
-            <Button type="button" loading={busy === "bank-save"} onClick={() => void saveToBank()}>
-              <Library className="h-3.5 w-3.5" />
-              Salva nella banca
-            </Button>
-          </>
-        }
-      >
-        <div className="space-y-3">
-          <p className="line-clamp-4 rounded-lg border bg-muted/30 px-3 py-2.5 text-[12.5px]">{bankItem?.prompt}</p>
-          <Field label="Visibilità">
-            <Select
-              value={bankForm.visibility}
-              onChange={(event) => setBankForm((prev) => ({ ...prev, visibility: event.target.value }))}
-            >
-              {VISIBILITIES.map((visibility) => (
-                <option key={visibility.value} value={visibility.value}>
-                  {visibility.label}
-                </option>
-              ))}
-            </Select>
-          </Field>
-          <Field label="Tag" hint="Separati da virgola. Materia, indirizzo e anno vengono aggiunti automaticamente.">
-            <Input
-              value={bankForm.tags}
-              onChange={(event) => setBankForm((prev) => ({ ...prev, tags: event.target.value }))}
-              placeholder="derivate, verifica di competenza…"
-            />
-          </Field>
-          <Field label="Note">
-            <Textarea
-              value={bankForm.notes}
-              rows={3}
-              onChange={(event) => setBankForm((prev) => ({ ...prev, notes: event.target.value }))}
-              placeholder="Indicazioni d'uso, varianti, livello di difficoltà…"
-            />
-          </Field>
-        </div>
       </Modal>
 
       <Modal
@@ -868,8 +759,7 @@ export function TestEditor({
       >
         <p className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-[13px] leading-relaxed text-red-900">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-          La verifica, i quesiti e lo storico versioni verranno eliminati. L&apos;operazione non è reversibile. Le voci
-          già salvate nella banca quesiti restano disponibili.
+          La verifica, i quesiti e lo storico versioni verranno eliminati. L&apos;operazione non è reversibile.
         </p>
         <p className="mt-2 text-[11.5px] text-muted-foreground">Autore: {test.authorName}</p>
       </Modal>

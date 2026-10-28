@@ -5,6 +5,11 @@ node_modules/
 
 # Build
 .next/
+.open-next/
+.wrangler/
+.dev.vars
+lib/generated/
+cloudflare-env.d.ts
 out/
 build/
 dist/
@@ -17,9 +22,9 @@ next-env.d.ts
 .env.*.local
 !.env.example
 
-# Database locale
-prisma/dev.db
-prisma/dev.db-journal
+# Database locale (D1 in locale vive in .wrangler/)
+prisma/*.db
+prisma/*.db-journal
 data/
 *.sqlite
 *.sqlite3

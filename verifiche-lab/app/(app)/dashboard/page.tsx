@@ -1,11 +1,10 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  BookOpenCheck,
   CheckCircle2,
   ClipboardList,
   FileText,
-  Library,
+  PencilLine,
   Plus,
   Sparkles,
   TriangleAlert,
@@ -18,7 +17,6 @@ import { PageHeader, Stat } from "@/components/ui/page-header";
 import { Card, CardBody, CardHeader, EmptyState } from "@/components/ui/card";
 import { Badge, StatusBadge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
-import { Notice } from "@/components/ui/notice";
 
 export const dynamic = "force-dynamic";
 
@@ -27,32 +25,24 @@ export const metadata = { title: "Panoramica" };
 export default async function DashboardPage() {
   const user = await requireUser();
   const now = new Date();
-  const firstName = user.name.split(" ")[0] ?? user.name;
 
-  const [tests, totalTests, publishedCurricula, myCurricula, bankCount, approvedCount, draftCount, lastTest] =
-    await Promise.all([
-      prisma.test.findMany({
-        where: { authorId: user.id },
-        orderBy: { updatedAt: "desc" },
-        take: 6,
-        include: { _count: { select: { items: true } }, items: { select: { points: true, estimatedMin: true } } },
-      }),
-      prisma.test.count({ where: { authorId: user.id } }),
-      prisma.curriculum.count({ where: { status: "pubblicato" } }),
-      prisma.curriculum.count({ where: { authorId: user.id } }),
-      prisma.itemBankEntry.count({
-        where: user.role === "admin" ? {} : { OR: [{ visibility: { not: "privato" } }, { ownerId: user.id }] },
-      }),
-      prisma.test.count({ where: { authorId: user.id, status: "approvata" } }),
-      prisma.test.count({ where: { authorId: user.id, status: "bozza" } }),
-      prisma.test.findFirst({
-        where: { authorId: user.id },
-        orderBy: { updatedAt: "desc" },
-        include: { _count: { select: { items: true } } },
-      }),
-    ]);
+  const [tests, totalTests, approvedCount, draftCount, lastTest] = await Promise.all([
+    prisma.test.findMany({
+      where: { authorId: user.id },
+      orderBy: { updatedAt: "desc" },
+      take: 6,
+      include: { _count: { select: { items: true } }, items: { select: { points: true, estimatedMin: true } } },
+    }),
+    prisma.test.count({ where: { authorId: user.id } }),
+    prisma.test.count({ where: { authorId: user.id, status: "approvata" } }),
+    prisma.test.count({ where: { authorId: user.id, status: "bozza" } }),
+    prisma.test.findFirst({
+      where: { authorId: user.id },
+      orderBy: { updatedAt: "desc" },
+      include: { _count: { select: { items: true } } },
+    }),
+  ]);
 
-  const canStart = publishedCurricula > 0;
   const greeting =
     now.getHours() < 13 ? "Buongiorno" : now.getHours() < 18 ? "Buon pomeriggio" : "Buonasera";
 
@@ -65,8 +55,8 @@ export default async function DashboardPage() {
           month: "long",
           year: "numeric",
         }).format(now)}
-        title={`${greeting}, ${firstName}.`}
-        description="Riprendi una verifica, prepara la prossima oppure controlla la copertura dei programmi del dipartimento."
+        title={`${greeting}.`}
+        description="Riprendi una verifica oppure prepara la prossima. Le verifiche sono salvate nel database e puoi scaricarle in qualsiasi momento."
         actions={
           <>
             <ButtonLink href="/verifiche" variant="outline" size="md">
@@ -81,22 +71,7 @@ export default async function DashboardPage() {
         }
       />
 
-      {!canStart ? (
-        <Notice
-          tone="warning"
-          title="Nessun programma pubblicato"
-          action={
-            <ButtonLink href="/programmi" variant="outline" size="sm">
-              Vai ai programmi
-            </ButtonLink>
-          }
-        >
-          Per generare una verifica serve almeno un programma pubblicato dal dipartimento. Puoi crearne uno
-          anche tu: incolla il testo del curricolo e rivedi la struttura proposta.
-        </Notice>
-      ) : null}
-
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         <Stat
           label="Verifiche"
           value={String(totalTests)}
@@ -105,16 +80,10 @@ export default async function DashboardPage() {
           tone="primary"
         />
         <Stat
-          label="Programmi pubblicati"
-          value={String(publishedCurricula)}
-          note={myCurricula > 0 ? `${myCurricula} creati da te` : "Classico e Scientifico, 1ª–5ª"}
-          icon={<BookOpenCheck className="h-4 w-4" />}
-        />
-        <Stat
-          label="Banca quesiti"
-          value={String(bankCount)}
-          note="Quesiti visibili e riutilizzabili"
-          icon={<Library className="h-4 w-4" />}
+          label="In bozza"
+          value={String(draftCount)}
+          note="Da rivedere e approvare"
+          icon={<PencilLine className="h-4 w-4" />}
         />
         <Stat
           label="Ultima modifica"
@@ -201,9 +170,9 @@ export default async function DashboardPage() {
             <CardBody className="space-y-4">
               {[
                 {
-                  title: "Scegli il programma",
+                  title: "Scegli il contesto",
                   text: "Indirizzo, anno e materia: il contesto didattico guida ogni scelta.",
-                  href: "/programmi",
+                  href: "/verifiche/nuova",
                 },
                 {
                   title: "Componi la verifica",
@@ -212,7 +181,7 @@ export default async function DashboardPage() {
                 },
                 {
                   title: "Rivedi ed esporta",
-                  text: "Modifica i quesiti, approva, scarica LaTeX, PDF, soluzioni e griglia.",
+                  text: "Modifica i quesiti, approva, scarica il LaTeX con soluzioni e griglia.",
                   href: "/verifiche",
                 },
               ].map((step, index) => (

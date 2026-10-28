@@ -7,7 +7,6 @@ import {
   ChevronDown,
   ChevronUp,
   Copy,
-  Library,
   Lock,
   Plus,
   RefreshCw,
@@ -80,7 +79,6 @@ export function ItemCard({
   onDuplicate,
   onRegenerate,
   onToggleLock,
-  onSaveToBank,
   onMove,
 }: {
   item: SerializedItem;
@@ -95,7 +93,6 @@ export function ItemCard({
   onDuplicate: (item: SerializedItem) => Promise<boolean>;
   onRegenerate: (item: SerializedItem) => Promise<boolean>;
   onToggleLock: (item: SerializedItem) => Promise<boolean>;
-  onSaveToBank: (item: SerializedItem) => void;
   onMove: (item: SerializedItem, direction: -1 | 1) => Promise<boolean>;
 }) {
   const [open, setOpen] = useState(index === 0);
@@ -284,9 +281,6 @@ export function ItemCard({
               onClick={() => void runAction("lock", () => onToggleLock(item))}
             >
               {item.isLocked ? <Unlock className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />}
-            </IconButton>
-            <IconButton label="Salva nella banca quesiti" disabled={Boolean(working)} onClick={() => onSaveToBank(item)}>
-              <Library className="h-3.5 w-3.5" />
             </IconButton>
             <IconButton
               label="Elimina quesito"

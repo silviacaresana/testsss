@@ -83,8 +83,8 @@ export function ExportPanel({
   return (
     <div className="space-y-5">
       <Notice tone="info" title="Il sorgente .tex è un prodotto, non un dettaglio">
-        Ogni documento è un file LaTeX autonomo, compilabile con Tectonic o pdflatex. Se la compilazione server non è
-        disponibile, scarica il .tex e compilalo in locale: non serve alcun file di supporto.
+        Ogni documento è un file LaTeX autonomo, compilabile con Overleaf, Tectonic o pdflatex: non serve alcun file di
+        supporto. Il server non produce PDF; per un PDF immediato usa «Stampa / Salva come PDF» nella scheda Anteprima.
       </Notice>
 
       {failure ? (
@@ -125,16 +125,6 @@ export function ExportPanel({
                 <Button
                   type="button"
                   size="sm"
-                  loading={busy === `pdf-${document.kind}`}
-                  onClick={() => void download("pdf", document.kind)}
-                >
-                  {busy === `pdf-${document.kind}` ? null : <FileDown className="h-3.5 w-3.5" />}
-                  PDF
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
                   loading={busy === `tex-${document.kind}`}
                   onClick={() => void download("tex", document.kind)}
                 >
@@ -152,14 +142,14 @@ export function ExportPanel({
         <Card>
           <CardHeader
             title="Pacchetto completo (.zip)"
-            description="I tre documenti in .tex e .pdf, più i dati strutturati e un README con le istruzioni di compilazione."
+            description="I tre documenti in .tex, più i dati strutturati e un README con le istruzioni di compilazione."
             icon={<Package className="h-4 w-4" />}
             action={<Badge tone="green">consigliato</Badge>}
           />
           <CardBody className="flex flex-wrap items-center justify-between gap-3">
             <div className="space-y-1 text-[12px] text-muted-foreground">
               <p>Contenuto: verifica, soluzioni, griglia · JSON · README.txt</p>
-              <p>Se un PDF non viene compilato, nel pacchetto trovi il .tex e il relativo log.</p>
+              <p>Nel pacchetto trovi anche un breve file di log che spiega perché non ci sono i PDF.</p>
             </div>
             <Button
               type="button"
@@ -194,7 +184,7 @@ export function ExportPanel({
 
       <p className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3.5 py-3 text-[12px] leading-relaxed text-amber-900">
         <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" />
-        Prima di stampare, controlla l&apos;anteprima PDF: formule, figure e a capo possono richiedere una piccola
+        Prima di stampare, controlla l&apos;anteprima: formule, figure e a capo possono richiedere una piccola
         correzione manuale del sorgente .tex. Il file resta modificabile in qualsiasi editor di testo.
       </p>
     </div>

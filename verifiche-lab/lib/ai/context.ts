@@ -1,5 +1,4 @@
-import fs from "node:fs";
-import path from "node:path";
+import { prompts } from "@/lib/generated/assets";
 import type { GeneratedItem, GenerationRequest } from "@/lib/schemas";
 import { parseJson } from "@/lib/utils";
 import type { TopicContext } from "@/lib/generation/deterministic";
@@ -26,14 +25,8 @@ export interface GenerationContext {
   promptExcerpt: string;
 }
 
-const promptRoot = path.join(process.cwd(), "prompts");
-
 function readPrompt(relative: string): string {
-  try {
-    return fs.readFileSync(path.join(promptRoot, relative), "utf8");
-  } catch {
-    return "";
-  }
+  return prompts[relative] ?? "";
 }
 
 function fill(template: string, values: Record<string, string>): string {

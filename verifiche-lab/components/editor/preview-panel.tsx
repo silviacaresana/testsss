@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { Download, ExternalLink, FileText, RefreshCw, TriangleAlert } from "lucide-react";
-import { apiFetch, downloadRequest, triggerDownload, ApiError } from "@/lib/client/api";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { ExternalLink, FileText, Printer, RefreshCw, TriangleAlert } from "lucide-react";
+import { apiFetch, ApiError } from "@/lib/client/api";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -34,7 +34,7 @@ export function PreviewPanel({
   const [nonce, setNonce] = useState(0);
   const [check, setCheck] = useState<PreviewCheck | null>(null);
   const [loading, setLoading] = useState(true);
-  const [downloading, setDownloading] = useState(false);
+  const frameRef = useRef<HTMLIFrameElement>(null);
 
   const checkPreview = useCallback(async () => {
     setLoading(true);
@@ -59,20 +59,14 @@ export function PreviewPanel({
     void checkPreview();
   }
 
-  async function downloadPdf() {
-    setDownloading(true);
-    try {
-      const result = await downloadRequest(
-        `/api/tests/${testId}/export`,
-        { format: "pdf", kind },
-        `anteprima-${kind}.pdf`,
-      );
-      triggerDownload(result);
-    } catch (error) {
-      const apiError = error instanceof ApiError ? error : null;
-      onError(apiError?.message ?? "Download PDF non riuscito.", apiError?.issues);
-    } finally {
-      setDownloading(false);
+  /** Il PDF si ottiene dal browser: «Stampa» → «Salva come PDF» (il server non compila LaTeX). */
+  function printPreview() {
+    const frame = frameRef.current?.contentWindow;
+    if (frame) {
+      frame.focus();
+      frame.print();
+    } else {
+      window.open(src, "_blank", "noopener");
     }
   }
 
@@ -120,17 +114,18 @@ export function PreviewPanel({
             <ExternalLink className="h-3.5 w-3.5" />
             Nuova scheda
           </Button>
-          <Button type="button" size="sm" loading={downloading} onClick={() => void downloadPdf()}>
-            {downloading ? null : <Download className="h-3.5 w-3.5" />}
-            PDF
+          <Button type="button" size="sm" onClick={printPreview}>
+            <Printer className="h-3.5 w-3.5" />
+            Stampa / Salva come PDF
           </Button>
         </div>
       </div>
 
       {!loading && check && !check.engineAvailable ? (
-        <Notice tone="warning" title="Motore LaTeX non disponibile">
-          L&apos;anteprima usa il rendering HTML con KaTeX. Gli export .tex restano scaricabili e compilabili su una macchina
-          con Tectonic o pdflatex installato.
+        <Notice tone="info" title="Anteprima HTML">
+          Il server non compila i PDF LaTeX. Per avere un PDF usa «Stampa / Salva come PDF» (scegli «Salva come PDF» nella
+          finestra di stampa). I file .tex restano scaricabili dalla scheda Esporta e si compilano con Overleaf, pdfLaTeX o
+          Tectonic.
         </Notice>
       ) : null}
 
@@ -147,6 +142,7 @@ export function PreviewPanel({
           Anteprima {KINDS.find((entry) => entry.value === kind)?.label.toLowerCase()} · aggiornata alla versione corrente
         </div>
         <iframe
+          ref={frameRef}
           key={`${kind}-${nonce}`}
           src={src}
           title={`Anteprima ${kind}`}

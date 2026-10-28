@@ -1,0 +1,5 @@
+# Copia in .dev.vars per `npm run dev:wrangler` (prove in locale).
+# NON caricare mai questo file con valori veri su GitHub.
+ALLOW_PUBLIC=true
+# Facoltativo: bozza con AI
+# ANTHROPIC_API_KEY=

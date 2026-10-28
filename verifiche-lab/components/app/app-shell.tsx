@@ -2,78 +2,23 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import {
-  BookOpen,
-  ChevronRight,
-  FileText,
-  Gauge,
-  GraduationCap,
-  LayoutDashboard,
-  Library,
-  LogOut,
-  Menu,
-  Plus,
-  Settings,
-  ShieldCheck,
-  UserRound,
-  X,
-} from "lucide-react";
+import { usePathname } from "next/navigation";
+import { ChevronRight, FileText, LayoutDashboard, Menu, Plus, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/logo";
-import { apiFetch } from "@/lib/client/api";
-import { Button } from "@/components/ui/button";
-
-interface ShellUser {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-}
 
 const primaryNav = [
   { href: "/dashboard", label: "Panoramica", icon: LayoutDashboard },
   { href: "/verifiche", label: "Verifiche", icon: FileText },
-  { href: "/programmi", label: "Programmi", icon: BookOpen },
-  { href: "/banca", label: "Banca quesiti", icon: Library },
 ];
 
-const adminNav = [
-  { href: "/amministrazione", label: "Amministrazione", icon: Gauge },
-  { href: "/amministrazione/utenti", label: "Docenti e inviti", icon: ShieldCheck },
-  { href: "/amministrazione/impostazioni", label: "Impostazioni", icon: Settings },
-  { href: "/amministrazione/log", label: "Log e consumi", icon: GraduationCap },
-];
-
-function initials(name: string) {
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join("");
-}
-
-export function AppShell({ user, children }: { user: ShellUser; children: React.ReactNode }) {
+export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
-
-  async function logout() {
-    setLoggingOut(true);
-    try {
-      await apiFetch("/api/auth/logout", { method: "POST" });
-    } catch {
-      /* il cookie viene comunque invalidato lato server, se possibile */
-    }
-    router.replace("/login");
-    router.refresh();
-  }
 
   const isActive = (href: string) =>
     href === "/dashboard" ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
@@ -133,77 +78,10 @@ export function AppShell({ user, children }: { user: ShellUser; children: React.
               </li>
             ))}
           </ul>
-
-          {user.role === "admin" ? (
-            <>
-              <p className="mt-6 px-2 pb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground/80">
-                Dipartimento
-              </p>
-              <ul className="space-y-0.5">
-                {adminNav.map((item) => (
-                  <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      className={cn(
-                        "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-medium transition",
-                        isActive(item.href)
-                          ? "bg-primary/[0.08] text-primary"
-                          : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                      )}
-                    >
-                      <item.icon className="h-4 w-4" />
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </>
-          ) : null}
-
-          <p className="mt-6 px-2 pb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground/80">
-            Account
-          </p>
-          <ul>
-            <li>
-              <Link
-                href="/profilo"
-                className={cn(
-                  "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-medium transition",
-                  isActive("/profilo")
-                    ? "bg-primary/[0.08] text-primary"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                )}
-              >
-                <UserRound className="h-4 w-4" />
-                Profilo e preferenze
-              </Link>
-            </li>
-          </ul>
         </nav>
 
-        <div className="border-t px-4 py-4">
-          <div className="flex items-center gap-2.5">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-secondary text-[12px] font-semibold text-secondary-foreground">
-              {initials(user.name) || "VL"}
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-[13px] font-semibold leading-tight">{user.name}</p>
-              <p className="truncate text-[11px] text-muted-foreground">
-                {user.role === "admin" ? "Referente di dipartimento" : "Docente"}
-              </p>
-            </div>
-          </div>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="mt-2 w-full justify-start px-2 text-muted-foreground"
-            onClick={logout}
-            loading={loggingOut}
-          >
-            <LogOut className="h-3.5 w-3.5" />
-            Esci
-          </Button>
+        <div className="border-t px-4 py-4 text-[11px] leading-snug text-muted-foreground">
+          Le verifiche sono condivise: chi entra nel sito vede e modifica tutto l&apos;archivio.
         </div>
       </aside>
 
@@ -238,7 +116,7 @@ export function AppShell({ user, children }: { user: ShellUser; children: React.
         <footer className="mx-auto w-full max-w-[1180px] px-4 pb-6 text-[11px] text-muted-foreground sm:px-6 lg:px-10">
           <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/60 pt-4">
             <span>VerificheLab · uso interno del dipartimento</span>
-            <span>LaTeX · PDF · soluzioni · griglie</span>
+            <span>LaTeX · soluzioni · griglie</span>
           </div>
         </footer>
       </div>

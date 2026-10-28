@@ -18,36 +18,6 @@ export class ApiError extends Error {
   }
 }
 
-function readCookie(name: string): string | undefined {
-  if (typeof document === "undefined") return undefined;
-  for (const part of document.cookie.split(";")) {
-    const [key, ...rest] = part.trim().split("=");
-    if (key === name) return decodeURIComponent(rest.join("="));
-  }
-  return undefined;
-}
-
-export function csrfToken(): string {
-  return readCookie("vl_csrf") ?? "";
-}
-
-export async function ensureCsrf(): Promise<string> {
-  let token = csrfToken();
-  if (!token) {
-    try {
-      const response = await fetch("/api/auth/csrf", { cache: "no-store" });
-      if (response.ok) {
-        const data = (await response.json()) as { token?: string };
-        token = data.token ?? "";
-      }
-    } catch {
-      token = "";
-    }
-    if (!token) token = csrfToken();
-  }
-  return token;
-}
-
 export interface ApiFetchOptions {
   method?: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
   body?: unknown;
@@ -58,9 +28,6 @@ export async function apiFetch<T>(url: string, options: ApiFetchOptions = {}): P
   const method = options.method ?? (options.body === undefined ? "GET" : "POST");
   const headers: Record<string, string> = { ...(options.headers ?? {}) };
   if (options.body !== undefined) headers["content-type"] = "application/json";
-  if (method !== "GET") {
-    headers["x-csrf-token"] = await ensureCsrf();
-  }
   const response = await fetch(url, {
     method,
     headers,
@@ -97,7 +64,7 @@ export interface DownloadResult {
 export async function downloadRequest(url: string, body: unknown, fallbackName: string): Promise<DownloadResult> {
   const response = await fetch(url, {
     method: "POST",
-    headers: { "content-type": "application/json", "x-csrf-token": await ensureCsrf() },
+    headers: { "content-type": "application/json" },
     body: JSON.stringify(body),
   });
   if (!response.ok) {

@@ -1,15 +1,21 @@
-// Schema VerificheLab.
+// Schema VerificheLab (versione Cloudflare D1).
 // Nota: SQLite non supporta enum né array nativi; i campi elenco sono JSON
-// serializzati in String e validati con Zod. Lo schema è portabile su PostgreSQL
-// cambiando solo il provider (vedi docs/decisioni.md, ADR-002).
+// serializzati in String e validati con Zod.
+//
+// D1 è SQLite gestito da Cloudflare: il database vero è il binding «DB» di wrangler.jsonc.
+// Il generatore usa il client senza motore Rust (engineType = "client", Prisma ≥ 6.16) con
+// l'adattatore @prisma/adapter-d1. Non impostare «output»: OpenNext deve poter modificare il
+// client generato.
 
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
+  engineType = "client"
 }
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
+  // Non usato a runtime (il database è il binding D1); serve solo a Prisma per generare client e SQL.
+  url      = "file:./schema-only.db"
 }
 
 model User {
@@ -23,39 +29,12 @@ model User {
   createdAt     DateTime @default(now())
   lastLogin     DateTime?
 
-  sessions       Session[]
-  invites        Invite[]
   curricula      Curriculum[]
   tests          Test[]
   bankEntries    ItemBankEntry[]
   generationRuns GenerationRun[]
   auditLogs      AuditLog[]
   testVersions   TestVersion[]
-}
-
-model Session {
-  id        String   @id @default(cuid())
-  tokenHash String   @unique
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-
-  @@index([userId])
-}
-
-model Invite {
-  id          String    @id @default(cuid())
-  email       String
-  role        String    @default("teacher")
-  token       String    @unique
-  expiresAt   DateTime
-  createdById String
-  createdBy   User      @relation(fields: [createdById], references: [id], onDelete: Cascade)
-  usedAt      DateTime?
-  createdAt   DateTime  @default(now())
-
-  @@index([email])
 }
 
 model Curriculum {
