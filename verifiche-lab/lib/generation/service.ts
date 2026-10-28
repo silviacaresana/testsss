@@ -20,7 +20,6 @@ import {
 import { AiError } from "@/lib/ai/provider";
 import {
   itemBankSnapshotToContext,
-  serializeBankSnapshot,
   type ContextBankItem,
 } from "@/lib/ai/context";
 import {
@@ -271,7 +270,12 @@ async function persistGeneratedTest(input: PersistInput): Promise<string> {
     orderBy: { name: "asc" },
   });
 
-  return prisma.$transaction(async (tx) => {
+  // D1 non supporta le transazioni: Prisma esegue le query una alla volta e non annulla quelle già fatte
+  // se una successiva fallisce. Se qualcosa va storto elimino io la verifica appena creata
+  // (sezioni, quesiti e griglia collegati vengono eliminati a cascata).
+  let createdId: string | null = null;
+  try {
+    const tx = prisma;
     const test = await tx.test.create({
       data: {
         title: input.title,
@@ -304,6 +308,7 @@ async function persistGeneratedTest(input: PersistInput): Promise<string> {
         parentTestId: input.parentTestId ?? null,
       },
     });
+    createdId = test.id;
 
     const sectionMap = new Map<string, string>();
     for (let index = 0; index < generated.sections.length; index++) {
@@ -383,7 +388,10 @@ async function persistGeneratedTest(input: PersistInput): Promise<string> {
     });
 
     return test.id;
-  });
+  } catch (error) {
+    if (createdId) await prisma.test.delete({ where: { id: createdId } }).catch(() => undefined);
+    throw error;
+  }
 }
 
 async function persistRuns(runs: AiRunLog[], userId: string, testId: string | null): Promise<void> {
@@ -755,13 +763,15 @@ export async function rebalanceTest(
   );
   if (!result.balanced) throw new GenerationError(result.adjustments.join(" "), result.adjustments);
 
-  await prisma.$transaction([
-    ...Object.entries(result.points).map(([id, points]) => prisma.item.update({ where: { id }, data: { points } })),
-    prisma.test.update({
-      where: { id: testId },
-      data: { totalPoints: desired, ...(test.status === "approvata" ? { status: "bozza" } : {}) },
-    }),
-  ]);
+  // D1 non ha transazioni: aggiorno prima il totale (e lo stato «bozza»), poi i singoli punteggi. Se un
+  // aggiornamento fallisce a metà il totale non torna e il riequilibrio si può semplicemente ripetere.
+  await prisma.test.update({
+    where: { id: testId },
+    data: { totalPoints: desired, ...(test.status === "approvata" ? { status: "bozza" } : {}) },
+  });
+  for (const [id, points] of Object.entries(result.points)) {
+    await prisma.item.update({ where: { id }, data: { points } });
+  }
   await createVersion(testId, user.id, `Riequilibrio punti (${desired} pt)`);
   await auditSafe(user.id, "riequilibrio", "Test", testId, { target: desired });
   const updated = await getTestForUser(testId, user);
@@ -975,12 +985,11 @@ export async function updateItem(
   if (Object.keys(data).length === 0) {
     return { test: serializeTest(test), item: serializeItem(item), suggestion: null };
   }
-  await prisma.$transaction([
-    prisma.item.update({ where: { id: itemId }, data }),
-    ...(test.status === "approvata"
-      ? [prisma.test.update({ where: { id: testId }, data: { status: "bozza" } })]
-      : []),
-  ]);
+  // Prima lo stato «bozza», poi la modifica (D1 non ha transazioni).
+  if (test.status === "approvata") {
+    await prisma.test.update({ where: { id: testId }, data: { status: "bozza" } });
+  }
+  await prisma.item.update({ where: { id: itemId }, data });
   await createVersion(testId, user.id, "Modifica quesito");
   await auditSafe(user.id, "modifica", "Item", itemId, { fields: Object.keys(data) });
   const updated = await getTestForUser(testId, user);
@@ -1078,31 +1087,30 @@ export async function regenerateItem(
     }
   }
 
-  await prisma.$transaction([
-    prisma.item.update({
-      where: { id: itemId },
-      data: {
-        prompt: generatedItem.prompt,
-        options: toJson(generatedItem.options ?? []),
-        correctOption: generatedItem.correct_option ?? null,
-        solutionSteps: toJson(generatedItem.solution_steps),
-        gradingCriteria: toJson(generatedItem.grading_criteria),
-        commonErrors: toJson(generatedItem.common_errors ?? []),
-        hints: toJson(generatedItem.hints ?? []),
-        answerSpace: generatedItem.answer_space,
-        figureSpec: generatedItem.figure_spec ? toJson(generatedItem.figure_spec) : null,
-        aiGenerated: true,
-        source: "ai",
-        points: item.points,
-        difficulty: item.difficulty,
-        estimatedMin: item.estimatedMin,
-        topicId: item.topicId,
-      },
-    }),
-    ...(test.status === "approvata"
-      ? [prisma.test.update({ where: { id: testId }, data: { status: "bozza" } })]
-      : []),
-  ]);
+  // Prima lo stato «bozza», poi la modifica (D1 non ha transazioni).
+  if (test.status === "approvata") {
+    await prisma.test.update({ where: { id: testId }, data: { status: "bozza" } });
+  }
+  await prisma.item.update({
+    where: { id: itemId },
+    data: {
+      prompt: generatedItem.prompt,
+      options: toJson(generatedItem.options ?? []),
+      correctOption: generatedItem.correct_option ?? null,
+      solutionSteps: toJson(generatedItem.solution_steps),
+      gradingCriteria: toJson(generatedItem.grading_criteria),
+      commonErrors: toJson(generatedItem.common_errors ?? []),
+      hints: toJson(generatedItem.hints ?? []),
+      answerSpace: generatedItem.answer_space,
+      figureSpec: generatedItem.figure_spec ? toJson(generatedItem.figure_spec) : null,
+      aiGenerated: true,
+      source: "ai",
+      points: item.points,
+      difficulty: item.difficulty,
+      estimatedMin: item.estimatedMin,
+      topicId: item.topicId,
+    },
+  });
   await createVersion(testId, user.id, "Rigenerazione quesito");
   await auditSafe(user.id, "rigenerazione", "Item", itemId, { provider: config.provider });
   const updated = await getTestForUser(testId, user);
@@ -1114,7 +1122,11 @@ export async function duplicateTest(testId: string, user: SessionUser): Promise<
   const test = await getTestForUser(testId, user);
   if (!canEditTest(user, test)) throw new GenerationError("Non hai i permessi per duplicare questa verifica.");
   const snapshot = buildSnapshot(test, "Duplicazione");
-  const newId = await prisma.$transaction(async (tx) => {
+  // Come in generazione: senza transazioni, se la copia fallisce a metà la elimino.
+  let copyId: string | null = null;
+  let newId: string;
+  try {
+    const tx = prisma;
     const copy = await tx.test.create({
       data: {
         title: `Copia di ${test.title}`,
@@ -1148,6 +1160,7 @@ export async function duplicateTest(testId: string, user: SessionUser): Promise<
         isTemplate: false,
       },
     });
+    copyId = copy.id;
     const sectionMap = new Map<string, string>();
     for (const section of [...test.sections].sort((a, b) => a.order - b.order)) {
       const created = await tx.section.create({
@@ -1202,8 +1215,11 @@ export async function duplicateTest(testId: string, user: SessionUser): Promise<
         },
       });
     }
-    return copy.id;
-  });
+    newId = copy.id;
+  } catch (error) {
+    if (copyId) await prisma.test.delete({ where: { id: copyId } }).catch(() => undefined);
+    throw error;
+  }
   await createVersion(newId, user.id, "Duplicazione");
   await auditSafe(user.id, "duplicazione", "Test", newId, { from: testId, snapshot: snapshot.label });
   const created = await getTestForUser(newId, user);
@@ -1235,7 +1251,11 @@ export async function restoreTestVersion(
   const snapshot = parseJson<ReturnType<typeof buildSnapshot> | null>(version.snapshotJson, null);
   if (!snapshot || snapshot.schemaVersion !== 1) throw new GenerationError("Istantanea non valida.");
 
-  await prisma.$transaction(async (tx) => {
+  // Senza transazioni, un errore a metà ripristino lascerebbe la verifica incompleta: salvo prima lo stato
+  // attuale come versione, così non si perde e si può ripristinare di nuovo.
+  await createVersion(testId, user.id, `Prima del ripristino della versione ${version.version}`);
+  try {
+    const tx = prisma;
     await tx.item.deleteMany({ where: { testId } });
     await tx.section.deleteMany({ where: { testId } });
     await tx.rubric.deleteMany({ where: { testId } });
@@ -1309,7 +1329,12 @@ export async function restoreTestVersion(
         itemMappingJson: toJson(remapped),
       },
     });
-  });
+  } catch (error) {
+    console.error("ripristino versione fallito", error);
+    throw new GenerationError(
+      "Il ripristino non è stato completato. Riprova: il contenuto di prima è salvato nella versione «Prima del ripristino».",
+    );
+  }
   await createVersion(testId, user.id, `Ripristino versione ${version.version}`);
   await auditSafe(user.id, "ripristino", "Test", testId, { version: version.version });
   const restored = await getTestForUser(testId, user);
@@ -1324,42 +1349,41 @@ export async function duplicateItem(
   const test = await getEditableTest(testId, user);
   const item = test.items.find((candidate) => candidate.id === itemId);
   if (!item) throw new GenerationError("Quesito non trovato.");
-  await prisma.$transaction(async (tx) => {
-    await tx.item.updateMany({
-      where: { testId, order: { gte: item.order + 1 } },
-      data: { order: { increment: 1 } },
-    });
-    await tx.item.create({
-      data: {
-        testId,
-        sectionId: item.sectionId,
-        type: item.type,
-        prompt: item.prompt,
-        options: item.options,
-        correctOption: item.correctOption,
-        points: item.points,
-        difficulty: item.difficulty,
-        estimatedMin: item.estimatedMin,
-        topicId: item.topicId,
-        objectives: item.objectives,
-        solutionSteps: item.solutionSteps,
-        gradingCriteria: item.gradingCriteria,
-        commonErrors: item.commonErrors,
-        hints: item.hints,
-        answerSpace: item.answerSpace,
-        answerLines: item.answerLines,
-        figureSpec: item.figureSpec,
-        source: item.source,
-        isLocked: false,
-        order: item.order + 1,
-        aiGenerated: item.aiGenerated,
-        variantGroup: item.variantGroup,
-        notes: item.notes ? `${item.notes} (copia)` : "Copia",
-      },
-    });
-    if (test.status === "approvata") {
-      await tx.test.update({ where: { id: testId }, data: { status: "bozza" } });
-    }
+  // Prima lo stato «bozza», poi la modifica (D1 non ha transazioni).
+  if (test.status === "approvata") {
+    await prisma.test.update({ where: { id: testId }, data: { status: "bozza" } });
+  }
+  await prisma.item.updateMany({
+    where: { testId, order: { gte: item.order + 1 } },
+    data: { order: { increment: 1 } },
+  });
+  await prisma.item.create({
+    data: {
+      testId,
+      sectionId: item.sectionId,
+      type: item.type,
+      prompt: item.prompt,
+      options: item.options,
+      correctOption: item.correctOption,
+      points: item.points,
+      difficulty: item.difficulty,
+      estimatedMin: item.estimatedMin,
+      topicId: item.topicId,
+      objectives: item.objectives,
+      solutionSteps: item.solutionSteps,
+      gradingCriteria: item.gradingCriteria,
+      commonErrors: item.commonErrors,
+      hints: item.hints,
+      answerSpace: item.answerSpace,
+      answerLines: item.answerLines,
+      figureSpec: item.figureSpec,
+      source: item.source,
+      isLocked: false,
+      order: item.order + 1,
+      aiGenerated: item.aiGenerated,
+      variantGroup: item.variantGroup,
+      notes: item.notes ? `${item.notes} (copia)` : "Copia",
+    },
   });
   await createVersion(testId, user.id, "Duplicazione quesito");
   await auditSafe(user.id, "duplicazione", "Item", itemId, {});
@@ -1376,15 +1400,14 @@ export async function deleteItem(
   const item = test.items.find((candidate) => candidate.id === itemId);
   if (!item) throw new GenerationError("Quesito non trovato.");
   if (test.items.length <= 1) throw new GenerationError("La verifica deve contenere almeno un quesito.");
-  await prisma.$transaction(async (tx) => {
-    await tx.item.delete({ where: { id: itemId } });
-    await tx.item.updateMany({
-      where: { testId, order: { gt: item.order } },
-      data: { order: { decrement: 1 } },
-    });
-    if (test.status === "approvata") {
-      await tx.test.update({ where: { id: testId }, data: { status: "bozza" } });
-    }
+  // Prima lo stato «bozza», poi la modifica (D1 non ha transazioni).
+  if (test.status === "approvata") {
+    await prisma.test.update({ where: { id: testId }, data: { status: "bozza" } });
+  }
+  await prisma.item.delete({ where: { id: itemId } });
+  await prisma.item.updateMany({
+    where: { testId, order: { gt: item.order } },
+    data: { order: { decrement: 1 } },
   });
   await createVersion(testId, user.id, "Eliminazione quesito");
   await auditSafe(user.id, "eliminazione", "Item", itemId, {});
@@ -1402,109 +1425,14 @@ export async function reorderItems(
   if (orderedIds.length !== current.size || orderedIds.some((id) => !current.has(id))) {
     throw new GenerationError("L'ordine proposto non contiene tutti i quesiti della verifica.");
   }
-  await prisma.$transaction(
-    orderedIds.map((id, order) => prisma.item.update({ where: { id }, data: { order } })),
-  );
+  // D1 non ha transazioni: se un aggiornamento fallisce il riordino si può ripetere.
+  for (let order = 0; order < orderedIds.length; order++) {
+    await prisma.item.update({ where: { id: orderedIds[order] }, data: { order } });
+  }
   await createVersion(testId, user.id, "Riordino quesiti");
   await auditSafe(user.id, "riordino", "Test", testId, {});
   const updated = await getTestForUser(testId, user);
   return serializeTest(updated);
-}
-
-export async function addBankItemToTest(
-  testId: string,
-  entryId: string,
-  user: SessionUser,
-): Promise<SerializedTest> {
-  const test = await getEditableTest(testId, user);
-  const entry = await prisma.itemBankEntry.findUnique({ where: { id: entryId } });
-  if (!entry) throw new GenerationError("Quesito della banca non trovato.");
-  if (entry.visibility === "privato" && entry.ownerId !== user.id && user.role !== "admin") {
-    throw new GenerationError("Questo quesito è privato e non puoi usarlo.");
-  }
-  const snapshot = parseJson<Record<string, unknown>>(entry.itemSnapshotJson, {});
-  const prompt = typeof snapshot.prompt === "string" ? snapshot.prompt : "";
-  if (!prompt) throw new GenerationError("Il quesito della banca è vuoto o danneggiato.");
-  const type = typeof snapshot.type === "string" ? snapshot.type : "exercise";
-  const points = Number(snapshot.points) > 0 ? Number(snapshot.points) : 4;
-  const section = test.sections[0] ?? (await prisma.section.create({
-    data: { testId, title: "Quesiti", description: "", order: 0 },
-  }));
-  const topicId =
-    typeof snapshot.topicId === "string"
-      ? (
-          await prisma.topic.findFirst({
-            where: { id: snapshot.topicId, curriculumId: test.curriculumId ?? undefined },
-            select: { id: true },
-          })
-        )?.id ?? null
-      : null;
-  const last = test.items.reduce((max, item) => Math.max(max, item.order), -1);
-  await prisma.$transaction([
-    prisma.item.create({
-      data: {
-        testId,
-        sectionId: section.id,
-        type,
-        prompt,
-        options: toJson(Array.isArray(snapshot.options) ? snapshot.options : []),
-        correctOption: typeof snapshot.correctOption === "number" ? snapshot.correctOption : null,
-        points,
-        difficulty: Number(snapshot.difficulty) || 3,
-        estimatedMin: Number(snapshot.estimatedMin) || 5,
-        topicId,
-        objectives: toJson(Array.isArray(snapshot.objectives) ? snapshot.objectives : []),
-        solutionSteps: toJson(Array.isArray(snapshot.solutionSteps) ? snapshot.solutionSteps : []),
-        gradingCriteria: toJson(Array.isArray(snapshot.gradingCriteria) ? snapshot.gradingCriteria : []),
-        commonErrors: toJson(Array.isArray(snapshot.commonErrors) ? snapshot.commonErrors : []),
-        hints: toJson(Array.isArray(snapshot.hints) ? snapshot.hints : []),
-        answerSpace: typeof snapshot.answerSpace === "string" ? snapshot.answerSpace : "lined",
-        source: "banca",
-        order: last + 1,
-        aiGenerated: false,
-      },
-    }),
-    prisma.itemBankEntry.update({ where: { id: entryId }, data: { usageCount: { increment: 1 } } }),
-    ...(test.status === "approvata"
-      ? [prisma.test.update({ where: { id: testId }, data: { status: "bozza" } })]
-      : []),
-  ]);
-  await createVersion(testId, user.id, "Aggiunta dalla banca");
-  await auditSafe(user.id, "banca-aggiunta", "Test", testId, { entryId });
-  const updated = await getTestForUser(testId, user);
-  return serializeTest(updated);
-}
-
-export async function saveItemToBank(
-  testId: string,
-  itemId: string,
-  user: SessionUser,
-  options: { visibility: string; tags: string[]; notes: string },
-): Promise<{ id: string }> {
-  const test = await getEditableTest(testId, user);
-  const item = test.items.find((candidate) => candidate.id === itemId);
-  if (!item) throw new GenerationError("Quesito non trovato.");
-  const snapshot = serializeBankSnapshot(item);
-  const baseTags = [
-    test.subject,
-    test.track,
-    String(test.year),
-    item.type,
-    ...(item.topic?.code ? [item.topic.code] : []),
-  ];
-  const tags = [...new Set([...baseTags, ...options.tags.map((tag) => tag.trim()).filter(Boolean)])];
-  const entry = await prisma.itemBankEntry.create({
-    data: {
-      itemSnapshotJson: toJson(snapshot),
-      visibility: options.visibility,
-      ownerId: user.id,
-      tagsJson: toJson(tags),
-      notes: options.notes,
-      sourceTestId: testId,
-    },
-  });
-  await auditSafe(user.id, "banca-salvataggio", "ItemBankEntry", entry.id, { testId, itemId });
-  return { id: entry.id };
 }
 
 export async function exportTestJson(testId: string, user: SessionUser): Promise<Record<string, unknown>> {

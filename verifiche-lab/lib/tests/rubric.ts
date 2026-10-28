@@ -33,36 +33,35 @@ export async function updateRubric(testId: string, user: SessionUser, input: Rub
     mapping[item.id] = requested.length > 0 ? requested : [indicators[0]];
   }
 
-  await prisma.$transaction(async (tx) => {
-    await tx.rubric.upsert({
-      where: { testId },
-      create: {
-        testId,
-        indicatorsJson: toJson(indicators),
-        levelsJson: toJson(levels),
-        itemMappingJson: toJson(mapping),
-      },
-      update: {
-        indicatorsJson: toJson(indicators),
-        levelsJson: toJson(levels),
-        itemMappingJson: toJson(mapping),
-      },
-    });
-    const scalePatch: { gradeScaleId?: string | null } = {};
-    if (input.gradeScaleId !== undefined) scalePatch.gradeScaleId = input.gradeScaleId;
-    if (Object.keys(scalePatch).length > 0) {
-      await tx.test.update({ where: { id: testId }, data: scalePatch });
-    }
-    if (input.sufficiencyThreshold !== undefined && test.gradeScaleId) {
-      await tx.gradeScale.update({
-        where: { id: test.gradeScaleId },
-        data: { sufficiencyThreshold: input.sufficiencyThreshold },
-      });
-    }
-    if (test.status === "approvata") {
-      await tx.test.update({ where: { id: testId }, data: { status: "bozza" } });
-    }
+  // Prima lo stato «bozza», poi la modifica (D1 non ha transazioni).
+  if (test.status === "approvata") {
+    await prisma.test.update({ where: { id: testId }, data: { status: "bozza" } });
+  }
+  await prisma.rubric.upsert({
+    where: { testId },
+    create: {
+      testId,
+      indicatorsJson: toJson(indicators),
+      levelsJson: toJson(levels),
+      itemMappingJson: toJson(mapping),
+    },
+    update: {
+      indicatorsJson: toJson(indicators),
+      levelsJson: toJson(levels),
+      itemMappingJson: toJson(mapping),
+    },
   });
+  const scalePatch: { gradeScaleId?: string | null } = {};
+  if (input.gradeScaleId !== undefined) scalePatch.gradeScaleId = input.gradeScaleId;
+  if (Object.keys(scalePatch).length > 0) {
+    await prisma.test.update({ where: { id: testId }, data: scalePatch });
+  }
+  if (input.sufficiencyThreshold !== undefined && test.gradeScaleId) {
+    await prisma.gradeScale.update({
+      where: { id: test.gradeScaleId },
+      data: { sufficiencyThreshold: input.sufficiencyThreshold },
+    });
+  }
 
   await prisma.auditLog
     .create({

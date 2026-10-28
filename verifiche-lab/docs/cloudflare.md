@@ -96,11 +96,26 @@ presenti. I contenuti attuali sono segnaposto, **non** programmi ministeriali.
 
 ## Limiti e punti da verificare
 
-- **Transazioni.** L'app usa `$transaction` di Prisma in vari punti (generazione, approvazione, ripristino
-  delle versioni, riequilibrio). Con l'adattatore D1 Prisma non le esegue davvero in blocco: le singole query
-  partono una dopo l'altra, quindi un errore a metà può lasciare una modifica incompleta. L'ho ricavato da fonti
-  di terzi, non l'ho potuto confermare sulla versione di Prisma in uso. Per un archivio con pochi utenti il
-  rischio è basso, ma è la prima cosa da verificare e, se serve, da riscrivere con i `batch` di D1.
+- **Transazioni.** D1 non supporta le transazioni e, secondo la documentazione di Prisma, con l'adattatore D1
+  quelle richieste dal codice vengono «ignorate ed eseguite come singole query»: non danno errore, ma non c'è
+  il tutto-o-niente. Per questo il codice **non usa più `$transaction`**; le operazioni che scrivono più
+  righe sono scritte in modo che un errore a metà non faccia danni:
+  - *creazione e duplicazione di una verifica*: se un passaggio fallisce, la verifica appena creata viene
+    eliminata (sezioni, quesiti e griglia vanno via a cascata);
+  - *ripristino di una versione*: prima si salva lo stato attuale come versione «Prima del ripristino», poi si
+    ripristina; se fallisce a metà basta riprovare, e il contenuto di prima non è perso;
+  - *modifica, rigenerazione, duplicazione, eliminazione di un quesito e griglia di valutazione*: prima si
+    imposta lo stato «bozza», poi si fa la modifica, così non resta mai una verifica «approvata» con
+    contenuto cambiato;
+  - *riordino e riequilibrio dei punti*: aggiornamenti uno alla volta; se uno fallisce il totale o l'ordine non
+    tornano e l'operazione si ripete.
+
+  Un errore a metà può ancora lasciare piccole incoerenze (per esempio un buco nella numerazione dei quesiti),
+  mai la perdita di una verifica. Non è stato provato: serve un collaudo reale su D1. Per un'atomicità vera si
+  possono usare i `batch` di D1 con SQL scritto a mano.
+- **Codice rimosso.** Le funzioni di creazione, modifica e pubblicazione dei programmi, quelle delle scale di
+  voto e quelle della banca quesiti sono state eliminate: nessuna pagina o API le chiamava più e usavano
+  transazioni.
 - **Template LaTeX.** I Workers non permettono di compilare codice da stringhe, quindi i template Eta vengono
   precompilati da `scripts/embed-assets.mjs` (lanciato da `npm run dev/build/test`). Lo script usa
   `eta.compileToString`: se la versione di Eta installata lo espone diversamente, va adattato.
