@@ -37,8 +37,8 @@ Il sito in locale è aperto (`ALLOW_PUBLIC=true`) perché non c'è Cloudflare Ac
 ```bash
 npm install
 npx wrangler login
-npx wrangler d1 create verifiche            # copia il database_id in wrangler.jsonc
-npm run db:migrate:remote                   # crea la tabella
+# (database già creato: salta questo passaggio)
+# (schema già applicato: salta questo passaggio)
 npm run deploy
 ```
 

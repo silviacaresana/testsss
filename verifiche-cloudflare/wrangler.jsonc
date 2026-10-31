@@ -12,12 +12,12 @@
     "run_worker_first": true
   },
 
-  // Dopo `npx wrangler d1 create verifiche` incolla qui il database_id.
+  // Database già creato nell'account Cloudflare (schema già applicato).
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "verifiche",
-      "database_id": "INCOLLA-QUI-IL-DATABASE-ID",
+      "database_id": "f6d3efa5-03db-4374-a7a7-8fe393cd4fdc",
       "migrations_dir": "migrations"
     }
   ],
