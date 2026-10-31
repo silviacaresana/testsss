@@ -30,9 +30,7 @@
     // Metti "true" SOLO per una prova rapida: rende il sito aperto a chiunque.
     "ALLOW_PUBLIC": "false",
     // Nome dell'istituto precompilato nelle nuove verifiche (opzionale).
-    "INSTITUTE_NAME": "",
-    // Modello usato dalla bozza con AI (serve il segreto ANTHROPIC_API_KEY).
-    "AI_MODEL": "claude-sonnet-5-5"
+    "INSTITUTE_NAME": ""
   },
 
   "observability": { "enabled": true }
